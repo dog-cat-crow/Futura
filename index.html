@@ -63,8 +63,8 @@
         }
         #closeDetail {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 40px; /* 40px from the top */
+            left: calc(50% + 100px); /* 100px right from the center */
             font-size: 24px;
             color: white;
             background: none;
@@ -73,7 +73,7 @@
         }
         #songName {
             font-size: 28px; /* Increased font size for better visibility */
-            margin-top: 50px;
+            margin-top: 80px; /* 80px below the top */
         }
         #songImage {
             width: 250px; /* Adjusted size for better display */
@@ -82,19 +82,15 @@
             margin: 10px auto;
             display: block;
         }
-        .playButton img {
-            width: 50px; /* Adjusted icon size */
-            height: 50px; /* Adjusted icon size */
-        }
-        .downloadButton img {
-            width: 30px; /* Adjusted icon size */
-            height: 30px; /* Adjusted icon size */
-        }
         #playPauseButton {
             background: none;
             border: none;
             cursor: pointer;
-            margin-top: 20px; /* Space between song image and play button */
+            margin-top: 60px; /* 60px below the image */
+        }
+        .playButton img, .downloadButton img {
+            width: 50px; /* Adjusted icon size */
+            height: 50px; /* Adjusted icon size */
         }
     </style>
 </head>
@@ -135,8 +131,9 @@
         const songNameDisplay = document.getElementById('songName');
         const songImage = document.getElementById('songImage');
         const closeDetail = document.getElementById('closeDetail');
-        const audioPlayer = new Audio(); // Create audio player instance
         const playPauseButton = document.getElementById('playPauseButton');
+        const audioPlayer = new Audio(); // Create audio player instance
+        let currentPlayingSong = null; // Track the currently playing song
 
         songItems.forEach(item => {
             const playButton = item.querySelector('.playButton');
@@ -144,6 +141,12 @@
             const imageFile = item.dataset.image;
 
             playButton.onclick = () => {
+                // Pause the currently playing song if different
+                if (currentPlayingSong && currentPlayingSong !== songFile) {
+                    const previousPlayButton = document.querySelector(`.songItem[data-song="${currentPlayingSong}"] .playButton`);
+                    previousPlayButton.innerHTML = '<img src="play.png" alt="Play" />'; // Reset previous play button
+                }
+
                 if (audioPlayer.src.includes(songFile) && !audioPlayer.paused) {
                     audioPlayer.pause();
                     playPauseButton.innerHTML = '<img src="play.png" alt="Play" />'; // Change to play icon
@@ -151,6 +154,7 @@
                     audioPlayer.src = songFile;
                     audioPlayer.play();
                     playPauseButton.innerHTML = '<img src="pause.png" alt="Pause" />'; // Change to pause icon
+                    currentPlayingSong = songFile; // Track the current playing song
                 }
 
                 // Display song details
@@ -161,12 +165,18 @@
         });
 
         closeDetail.onclick = () => {
-            audioPlayer.pause();
-            audioPlayer.src = ''; // Reset audio source
-            songDetail.style.display = 'none';
-            songItems.forEach(item => {
-                item.querySelector('.playButton').innerHTML = '<img src="play.png" alt="Play" />'; // Reset play buttons
-            });
+            songDetail.style.display = 'none'; // Close the detail view without stopping the song
+        };
+
+        // Play/pause button functionality in the detail view
+        playPauseButton.onclick = () => {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+                playPauseButton.innerHTML = '<img src="pause.png" alt="Pause" />'; // Change to pause icon
+            } else {
+                audioPlayer.pause();
+                playPauseButton.innerHTML = '<img src="play.png" alt="Play" />'; // Change to play icon
+            }
         };
 
         // Download button functionality
