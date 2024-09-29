@@ -12,43 +12,23 @@
             margin: 0;
             padding: 0;
         }
-        #searchContainer {
-            text-align: center;
-            margin: 20px;
-        }
-        #searchButton {
-            background-color: lightgray;
-            border: none;
-            border-radius: 25px;
-            padding: 10px 20px;
-            font-size: 18px;
-            cursor: pointer;
-        }
         #songList {
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            padding: 20px;
+            list-style-type: none; /* Remove bullet points */
+            text-align: center; /* Center the list */
         }
         .songItem {
-            background-color: black;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 90%;
+            cursor: pointer; /* Change cursor on hover */
             padding: 10px;
             margin: 5px 0;
+            background-color: black;
+            border-radius: 10px;
         }
-        .songItem button {
-            background-color: transparent;
-            border: none;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
+        .songItem:hover {
+            background-color: #444; /* Change color on hover */
         }
         #songDetail {
-            display: none;
+            display: none; /* Initially hidden */
             position: fixed;
             top: 0;
             left: 0;
@@ -90,35 +70,20 @@
             cursor: pointer;
             margin-top: 60px; /* 60px below the image */
         }
-        .playButton img, .downloadButton img {
+        .playButton img {
             width: 50px; /* Adjusted icon size */
             height: 50px; /* Adjusted icon size */
         }
     </style>
 </head>
 <body>
-    <div id="searchContainer">
-        <input type="text" id="searchInput" placeholder="Search Songs..." oninput="filterSongs()" />
-        <button id="searchButton">Search</button>
-    </div>
 
-    <div id="songList">
-        <div class="songItem" data-song="alone.mp3" data-image="alone.jpg">
-            <button class="playButton"><img src="play.png" alt="Play" /></button>
-            Alone Part II
-            <button class="downloadButton"><img src="Download.png" alt="Download" /></button>
-        </div>
-        <div class="songItem" data-song="animals.mp3" data-image="animals.jpg">
-            <button class="playButton"><img src="play.png" alt="Play" /></button>
-            Animals
-            <button class="downloadButton"><img src="Download.png" alt="Download" /></button>
-        </div>
-        <div class="songItem" data-song="fly-away.mp3" data-image="fly-away.jpg">
-            <button class="playButton"><img src="play.png" alt="Play" /></button>
-            Fly Away
-            <button class="downloadButton"><img src="Download.png" alt="Download" /></button>
-        </div>
-    </div>
+    <ul id="songList">
+        <li class="songItem" data-title="Alone">Alone</li>
+        <li class="songItem" data-title="Animals">Animals</li>
+        <li class="songItem" data-title="Fly Away">Fly Away</li>
+        <!-- Add more song titles here in the future -->
+    </ul>
 
     <div id="songDetail">
         <button id="closeDetail">×</button>
@@ -138,15 +103,17 @@
         let currentPlayingSong = null; // Track the currently playing song
 
         songItems.forEach(item => {
-            const playButton = item.querySelector('.playButton');
-            const songFile = item.dataset.song;
-            const imageFile = item.dataset.image;
+            item.onclick = () => {
+                const songTitle = item.dataset.title;
+                const songFile = `${songTitle}.mp3`; // Derive audio file name
+                const imageFile = `${songTitle}.jpg`; // Derive image file name
 
-            playButton.onclick = () => {
                 // Pause the currently playing song if different
                 if (currentPlayingSong && currentPlayingSong !== songFile) {
-                    const previousPlayButton = document.querySelector(`.songItem[data-song="${currentPlayingSong}"] .playButton`);
-                    previousPlayButton.innerHTML = '<img src="play.png" alt="Play" />'; // Reset previous play button
+                    const previousPlayButton = document.querySelector(`.songItem[data-title="${currentPlayingSong.replace('.mp3', '')}"] .playButton`);
+                    if (previousPlayButton) {
+                        previousPlayButton.innerHTML = '<img src="play.png" alt="Play" />'; // Reset previous play button
+                    }
                 }
 
                 if (audioPlayer.src.includes(songFile) && !audioPlayer.paused) {
@@ -160,7 +127,7 @@
                 }
 
                 // Display song details
-                songNameDisplay.innerText = item.textContent.trim();
+                songNameDisplay.innerText = songTitle;
                 songImage.src = imageFile;
                 songDetail.style.display = 'flex';
             };
@@ -180,28 +147,6 @@
                 playPauseButton.innerHTML = '<img src="play.png" alt="Play" />'; // Change to play icon
             }
         };
-
-        // Download button functionality
-        document.querySelectorAll('.downloadButton').forEach(button => {
-            button.onclick = (e) => {
-                const songFile = e.target.parentNode.dataset.song;
-                const link = document.createElement('a');
-                link.href = songFile;
-                link.download = songFile;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            };
-        });
-
-        // Filter songs based on search input
-        function filterSongs() {
-            const searchInput = document.getElementById('searchInput').value.toLowerCase();
-            songItems.forEach(item => {
-                const songName = item.textContent.toLowerCase();
-                item.style.display = songName.includes(searchInput) ? 'flex' : 'none';
-            });
-        }
     </script>
 </body>
 </html>
