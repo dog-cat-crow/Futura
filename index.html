@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MP3 Song Player</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .play-button { cursor: pointer; font-size: 24px; margin-top: 20px; }
+        #albumArt { width: 200px; height: 200px; margin-top: 20px; display: none; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
+</head>
+<body>
+    <h1>MP3 Song Player</h1>
+    <img id="albumArt" alt="Album Art" />
+    <div class="play-button" id="playButton">▶ Play Song</div>
+    <audio id="audioPlayer" src="song.mp3" controls></audio>
+
+    <script>
+        const playButton = document.getElementById("playButton");
+        const audioPlayer = document.getElementById("audioPlayer");
+        const albumArt = document.getElementById("albumArt");
+
+        // Load album art from MP3 file
+        jsmediatags.read("song.mp3", {
+            onSuccess: function(tag) {
+                if (tag && tag.picture && tag.picture.length > 0) {
+                    const picture = tag.picture[0];
+                    const base64String = "data:" + picture.format + ";base64," + arrayBufferToBase64(picture.data);
+                    albumArt.src = base64String;
+                    albumArt.style.display = "block"; // Show the image
+                }
+            },
+            onError: function(error) {
+                console.log('Error reading tags:', error);
+            }
+        });
+
+        function arrayBufferToBase64(buffer) {
+            let binary = '';
+            const bytes = new Uint8Array(buffer);
+            const len = bytes.byteLength;
+            for (let i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return window.btoa(binary);
+        }
+
+        playButton.onclick = () => {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+                playButton.innerText = "⏸ Pause Song"; // Change text to pause
+            } else {
+                audioPlayer.pause();
+                playButton.innerText = "▶ Play Song"; // Change text to play
+            }
+        };
+    </script>
+</body>
+</html>
