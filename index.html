@@ -3,61 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MP3 Song Player</title>
+    <title>Mobile MP3 Player</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        .play-button { cursor: pointer; font-size: 24px; margin-top: 20px; }
-        #albumArt { width: 200px; height: 200px; margin-top: 20px; display: none; }
+        body {
+            background-color: #333; /* Dark gray background */
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        #searchContainer {
+            text-align: center;
+            margin: 20px;
+        }
+        #searchButton {
+            background-color: lightgray;
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        #songList {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .songItem {
+            background-color: black;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 90%;
+            padding: 10px;
+            margin: 5px 0;
+        }
+        .songItem button {
+            background-color: transparent;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        #songDetail {
+            display: none;
+            background-color: black;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px;
+        }
+        #songImage {
+            width: 200px;
+            height: 200px;
+            border-radius: 10px;
+            margin: 10px auto;
+        }
+        #audioPlayer {
+            width: 100%;
+            margin-top: 10px;
+        }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
 </head>
 <body>
-    <h1>MP3 Song Player</h1>
-    <img id="albumArt" alt="Album Art" />
-    <div class="play-button" id="playButton">▶ Play Song</div>
-    <audio id="audioPlayer" src="song.mp3" controls></audio>
+    <div id="searchContainer">
+        <input type="text" id="searchInput" placeholder="Search Songs..." />
+        <button id="searchButton">Search</button>
+    </div>
+    
+    <div id="songList">
+        <div class="songItem" data-song="alone.mp3" data-image="alone.jpg">
+            <button class="playButton">▶</button>
+            Alone Part II
+            <button class="downloadButton">⬇</button>
+        </div>
+        <div class="songItem" data-song="animals.mp3" data-image="animals.jpg">
+            <button class="playButton">▶</button>
+            Animals
+            <button class="downloadButton">⬇</button>
+        </div>
+        <div class="songItem" data-song="fly-away.mp3" data-image="fly-away.jpg">
+            <button class="playButton">▶</button>
+            Fly Away
+            <button class="downloadButton">⬇</button>
+        </div>
+    </div>
+
+    <div id="songDetail">
+        <h2 id="songName"></h2>
+        <img id="songImage" alt="Album Art" />
+        <audio id="audioPlayer" controls></audio>
+        <button id="closeDetail">Close</button>
+    </div>
 
     <script>
-        const playButton = document.getElementById("playButton");
-        const audioPlayer = document.getElementById("audioPlayer");
-        const albumArt = document.getElementById("albumArt");
+        const songItems = document.querySelectorAll('.songItem');
+        const songDetail = document.getElementById('songDetail');
+        const songNameDisplay = document.getElementById('songName');
+        const songImage = document.getElementById('songImage');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const closeDetail = document.getElementById('closeDetail');
 
-        // Load album art from MP3 file
-        jsmediatags.read("song.mp3", {
-            onSuccess: function(tag) {
-                if (tag && tag.picture && tag.picture.length > 0) {
-                    const picture = tag.picture[0];
-                    const base64String = "data:" + picture.format + ";base64," + arrayBufferToBase64(picture.data);
-                    albumArt.src = base64String;
-                    albumArt.style.display = "block"; // Show the image
+        songItems.forEach(item => {
+            const playButton = item.querySelector('.playButton');
+            const songFile = item.dataset.song;
+            const imageFile = item.dataset.image;
+
+            playButton.onclick = () => {
+                if (audioPlayer.src.includes(songFile) && !audioPlayer.paused) {
+                    audioPlayer.pause();
+                    playButton.innerText = '▶'; // Change to play icon
                 } else {
-                    console.log('No album artwork found in the MP3 file.');
+                    audioPlayer.src = songFile;
+                    audioPlayer.play();
+                    playButton.innerText = '⏸'; // Change to pause icon
                 }
-            },
-            onError: function(error) {
-                console.error('Error reading tags:', error);
-            }
+
+                // Display song details
+                songNameDisplay.innerText = item.textContent.trim();
+                songImage.src = imageFile;
+                songDetail.style.display = 'block';
+            };
         });
 
-        function arrayBufferToBase64(buffer) {
-            let binary = '';
-            const bytes = new Uint8Array(buffer);
-            const len = bytes.byteLength;
-            for (let i = 0; i < len; i++) {
-                binary += String.fromCharCode(bytes[i]);
-            }
-            return window.btoa(binary);
-        }
-
-        playButton.onclick = () => {
-            if (audioPlayer.paused) {
-                audioPlayer.play();
-                playButton.innerText = "⏸ Pause Song"; // Change text to pause
-            } else {
-                audioPlayer.pause();
-                playButton.innerText = "▶ Play Song"; // Change text to play
-            }
+        closeDetail.onclick = () => {
+            audioPlayer.pause();
+            audioPlayer.src = ''; // Reset audio source
+            songDetail.style.display = 'none';
+            songItems.forEach(item => {
+                item.querySelector('.playButton').innerText = '▶'; // Reset play buttons
+            });
         };
+
+        // Download button functionality
+        document.querySelectorAll('.downloadButton').forEach(button => {
+            button.onclick = (e) => {
+                const songFile = e.target.parentNode.dataset.song;
+                const link = document.createElement('a');
+                link.href = songFile;
+                link.download = songFile;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            };
+        });
     </script>
 </body>
 </html>
