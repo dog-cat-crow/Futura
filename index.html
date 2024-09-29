@@ -30,10 +30,12 @@
                     const base64String = "data:" + picture.format + ";base64," + arrayBufferToBase64(picture.data);
                     albumArt.src = base64String;
                     albumArt.style.display = "block"; // Show the image
+                } else {
+                    console.log('No album artwork found in the MP3 file.');
                 }
             },
             onError: function(error) {
-                console.log('Error reading tags:', error);
+                console.error('Error reading tags:', error);
             }
         });
 
