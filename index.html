@@ -98,21 +98,7 @@
         <button id="searchButton">Search</button>
     </div>
 
-    <ul id="songList">
-        <li class="songItem" data-title="Alone Part II">
-            Alone
-            <button class="playButton" data-title="Alone"><img src="play.png" alt="Play" /></button>
-        </li>
-        <li class="songItem" data-title="Animals">
-            Animals
-            <button class="playButton" data-title="Animals"><img src="play.png" alt="Play" /></button>
-        </li>
-        <li class="songItem" data-title="Fly Away">
-            Fly Away
-            <button class="playButton" data-title="Fly Away"><img src="play.png" alt="Play" /></button>
-        </li>
-        <!-- Add more song titles here in the future -->
-    </ul>
+    <ul id="songList"></ul> <!-- Dynamic song list -->
 
     <div id="songDetail">
         <button id="closeDetail">×</button>
@@ -122,7 +108,8 @@
     </div>
 
     <script>
-        const songItems = document.querySelectorAll('.songItem');
+        const songs = ["Alone Part II", "Animals", "Fly Away"]; // List of song titles
+        const songList = document.getElementById('songList');
         const songDetail = document.getElementById('songDetail');
         const songNameDisplay = document.getElementById('songName');
         const songImage = document.getElementById('songImage');
@@ -131,18 +118,24 @@
         const audioPlayer = new Audio(); // Create audio player instance
         let currentPlayingSong = null; // Track the currently playing song
 
-        // Add event listeners for song item clicks
-        songItems.forEach(item => {
-            const songTitle = item.dataset.title;
+        // Populate the song list dynamically
+        songs.forEach(title => {
+            const li = document.createElement('li');
+            li.className = 'songItem';
+            li.dataset.title = title;
+            li.innerHTML = `
+                ${title}
+                <button class="playButton" data-title="${title}"><img src="play.png" alt="Play" /></button>
+            `;
+            songList.appendChild(li);
 
-            item.onclick = () => {
-                openSongDetail(songTitle);
-            };
+            // Event listener for song item clicks
+            li.onclick = () => openSongDetail(title);
 
-            // Add event listener to the play button inside the song item
-            item.querySelector('.playButton').onclick = (e) => {
+            // Event listener for play button clicks
+            li.querySelector('.playButton').onclick = (e) => {
                 e.stopPropagation(); // Prevent the event from bubbling up to the item click
-                openSongDetail(songTitle);
+                openSongDetail(title);
             };
         });
 
@@ -193,7 +186,7 @@
         const searchInput = document.getElementById('searchInput');
         searchInput.addEventListener('input', () => {
             const filter = searchInput.value.toLowerCase();
-            songItems.forEach(item => {
+            document.querySelectorAll('.songItem').forEach(item => {
                 const songTitle = item.dataset.title.toLowerCase();
                 if (songTitle.includes(filter)) {
                     item.style.display = ''; // Show item
