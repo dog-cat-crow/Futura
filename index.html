@@ -12,6 +12,18 @@
             margin: 0;
             padding: 0;
         }
+        #searchContainer {
+            text-align: center;
+            margin: 20px;
+        }
+        #searchButton {
+            background-color: lightgray;
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+        }
         #songList {
             padding: 20px;
             list-style-type: none; /* Remove bullet points */
@@ -23,6 +35,9 @@
             margin: 5px 0;
             background-color: black;
             border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center; /* Align items vertically */
         }
         .songItem:hover {
             background-color: #444; /* Change color on hover */
@@ -71,17 +86,31 @@
             margin-top: 60px; /* 60px below the image */
         }
         .playButton img {
-            width: 50px; /* Adjusted icon size */
-            height: 50px; /* Adjusted icon size */
+            width: 30px; /* Adjusted icon size */
+            height: 30px; /* Adjusted icon size */
         }
     </style>
 </head>
 <body>
 
+    <div id="searchContainer">
+        <input type="text" id="searchInput" placeholder="Search Songs..." />
+        <button id="searchButton">Search</button>
+    </div>
+
     <ul id="songList">
-        <li class="songItem" data-title="Alone Part II">Alone</li>
-        <li class="songItem" data-title="Animals">Animals</li>
-        <li class="songItem" data-title="Fly Away">Fly Away</li>
+        <li class="songItem" data-title="Alone Part II">
+            Alone
+            <button class="playButton" data-title="Alone"><img src="play.png" alt="Play" /></button>
+        </li>
+        <li class="songItem" data-title="Animals">
+            Animals
+            <button class="playButton" data-title="Animals"><img src="play.png" alt="Play" /></button>
+        </li>
+        <li class="songItem" data-title="Fly Away">
+            Fly Away
+            <button class="playButton" data-title="Fly Away"><img src="play.png" alt="Play" /></button>
+        </li>
         <!-- Add more song titles here in the future -->
     </ul>
 
@@ -102,36 +131,48 @@
         const audioPlayer = new Audio(); // Create audio player instance
         let currentPlayingSong = null; // Track the currently playing song
 
+        // Add event listeners for song item clicks
         songItems.forEach(item => {
+            const songTitle = item.dataset.title;
+
             item.onclick = () => {
-                const songTitle = item.dataset.title;
-                const songFile = `${songTitle}.mp3`; // Derive audio file name
-                const imageFile = `${songTitle}.jpg`; // Derive image file name
+                openSongDetail(songTitle);
+            };
 
-                // Pause the currently playing song if different
-                if (currentPlayingSong && currentPlayingSong !== songFile) {
-                    const previousPlayButton = document.querySelector(`.songItem[data-title="${currentPlayingSong.replace('.mp3', '')}"] .playButton`);
-                    if (previousPlayButton) {
-                        previousPlayButton.innerHTML = '<img src="play.png" alt="Play" />'; // Reset previous play button
-                    }
-                }
-
-                if (audioPlayer.src.includes(songFile) && !audioPlayer.paused) {
-                    audioPlayer.pause();
-                    playPauseButton.innerHTML = '<img src="play.png" alt="Play" />'; // Change to play icon
-                } else {
-                    audioPlayer.src = songFile;
-                    audioPlayer.play();
-                    playPauseButton.innerHTML = '<img src="pause.png" alt="Pause" />'; // Change to pause icon
-                    currentPlayingSong = songFile; // Track the current playing song
-                }
-
-                // Display song details
-                songNameDisplay.innerText = songTitle;
-                songImage.src = imageFile;
-                songDetail.style.display = 'flex';
+            // Add event listener to the play button inside the song item
+            item.querySelector('.playButton').onclick = (e) => {
+                e.stopPropagation(); // Prevent the event from bubbling up to the item click
+                openSongDetail(songTitle);
             };
         });
+
+        const openSongDetail = (songTitle) => {
+            const songFile = `${songTitle}.mp3`; // Derive audio file name
+            const imageFile = `${songTitle}.jpg`; // Derive image file name
+
+            // Pause the currently playing song if different
+            if (currentPlayingSong && currentPlayingSong !== songFile) {
+                const previousPlayButton = document.querySelector(`.songItem[data-title="${currentPlayingSong.replace('.mp3', '')}"] .playButton img`);
+                if (previousPlayButton) {
+                    previousPlayButton.src = 'play.png'; // Reset previous play button
+                }
+            }
+
+            if (audioPlayer.src.includes(songFile) && !audioPlayer.paused) {
+                audioPlayer.pause();
+                playPauseButton.innerHTML = '<img src="play.png" alt="Play" />'; // Change to play icon
+            } else {
+                audioPlayer.src = songFile;
+                audioPlayer.play();
+                playPauseButton.innerHTML = '<img src="pause.png" alt="Pause" />'; // Change to pause icon
+                currentPlayingSong = songFile; // Track the current playing song
+            }
+
+            // Display song details
+            songNameDisplay.innerText = songTitle;
+            songImage.src = imageFile;
+            songDetail.style.display = 'flex';
+        };
 
         closeDetail.onclick = () => {
             songDetail.style.display = 'none'; // Close the detail view without stopping the song
@@ -147,6 +188,20 @@
                 playPauseButton.innerHTML = '<img src="play.png" alt="Play" />'; // Change to play icon
             }
         };
+
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', () => {
+            const filter = searchInput.value.toLowerCase();
+            songItems.forEach(item => {
+                const songTitle = item.dataset.title.toLowerCase();
+                if (songTitle.includes(filter)) {
+                    item.style.display = ''; // Show item
+                } else {
+                    item.style.display = 'none'; // Hide item
+                }
+            });
+        });
     </script>
 </body>
 </html>
