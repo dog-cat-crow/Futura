@@ -25,175 +25,175 @@
             cursor: pointer;
         }
         #songList {
-            padding: 20px;
-            list-style-type: none; /* Remove bullet points */
-            text-align: center; /* Center the list */
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .songItem {
-            cursor: pointer; /* Change cursor on hover */
-            padding: 10px;
-            margin: 5px 0;
             background-color: black;
             border-radius: 10px;
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center; /* Align items vertically */
+            width: 90%;
+            padding: 10px;
+            margin: 5px 0;
         }
-        .songItem:hover {
-            background-color: #444; /* Change color on hover */
+        .songItem button {
+            background-color: transparent;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
         }
         #songDetail {
+            padding: 35px;
+            position: fixed; /* Centering the container */
+            top: 50%; /* Center vertically */
+            left: 50%; /* Center horizontally */
+            transform: translate(-50%, -50%); /* Adjusting to center */
+            background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
+            border-radius: 10px;
+            width: 300px; /* Adjust width as needed */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Optional shadow */
             display: none; /* Initially hidden */
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            display: flex; /* Use flexbox */
-            flex-direction: column; /* Stack elements vertically */
-            align-items: center; /* Center items horizontally */
-            justify-content: center; /* Center items vertically */
-            text-align: center; /* Center text */
-            padding: 20px;
-            box-sizing: border-box;
         }
         #closeDetail {
             position: absolute;
-            top: 40px; /* 40px from the top */
-            left: calc(50% + 100px); /* 100px right from the center */
-            font-size: 24px;
-            color: white;
-            background: none;
-            border: none;
-            cursor: pointer;
+            top: 10px; /* 10 pixels from the top */
+            right: 10px; /* 10 pixels from the right */
         }
         #songName {
-            font-size: 28px; /* Increased font size for better visibility */
-            margin-top: 80px; /* 80px below the top */
+            margin-top: 40px; /* 40 pixels below the top of the container */
+            text-align: center; /* Centered */
+            font-size: 24px; /* Font size */
         }
         #songImage {
-            width: 100px; /* Adjusted size for better display */
-            height: 100px; /* Adjusted size for better display */
-            border-radius: 10px;
-            margin: 10px auto;
-            display: block;
+            margin-top: 30px; /* 30 pixels below the song title */
+            width: 150px; /* Size */
+            height: 150px; /* Size */
+            display: block; /* Centered */
+            margin-left: auto;
+            margin-right: auto;
         }
         #playPauseButton {
-            background: none;
-            border: none;
-            cursor: pointer;
-            margin-top: 60px; /* 60px below the image */
+            margin-top: 50px; /* 50 pixels below the song image */
+            width: 40px; /* Size */
+            height: 40px; /* Size */
+            display: block; /* Centered */
+            margin-left: auto;
+            margin-right: auto;
+            background: transparent; /* Optional */
+            border: none; /* No border */
+            cursor: pointer; /* Pointer on hover */
         }
-        .playButton img {
-            width: 30px; /* Adjusted icon size */
-            height: 30px; /* Adjusted icon size */
+        #audioPlayer {
+            width: 100%; /* Full width */
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-
     <div id="searchContainer">
         <input type="text" id="searchInput" placeholder="Search Songs..." />
         <button id="searchButton">Search</button>
     </div>
-
-    <ul id="songList"></ul> <!-- Dynamic song list -->
+    
+    <div id="songList">
+        <div class="songItem" data-song="Alone.mp3" data-image="Alone.jpg">
+            <button class="playButton">▶</button>
+            Alone
+            <button class="downloadButton">⬇</button>
+        </div>
+        <div class="songItem" data-song="Animals.mp3" data-image="Animals.jpg">
+            <button class="playButton">▶</button>
+            Animals
+            <button class="downloadButton">⬇</button>
+        </div>
+        <div class="songItem" data-song="Fly_Away.mp3" data-image="Fly_Away.jpg">
+            <button class="playButton">▶</button>
+            Fly Away
+            <button class="downloadButton">⬇</button>
+        </div>
+    </div>
 
     <div id="songDetail">
         <button id="closeDetail">×</button>
         <h2 id="songName"></h2>
         <img id="songImage" alt="Album Art" />
-        <button class="playButton" id="playPauseButton"><img src="play.png" alt="Play" /></button>
+        <button id="playPauseButton">
+            <img id="playPauseIcon" src="play.png" alt="Play/Pause" />
+        </button>
+        <audio id="audioPlayer" controls></audio>
     </div>
 
     <script>
-        const songs = ["Alone Part II", "Animals", "Fly Away"]; // List of song titles
-        const songList = document.getElementById('songList');
+        const songItems = document.querySelectorAll('.songItem');
         const songDetail = document.getElementById('songDetail');
         const songNameDisplay = document.getElementById('songName');
         const songImage = document.getElementById('songImage');
+        const audioPlayer = document.getElementById('audioPlayer');
         const closeDetail = document.getElementById('closeDetail');
         const playPauseButton = document.getElementById('playPauseButton');
-        const audioPlayer = new Audio(); // Create audio player instance
-        let currentPlayingSong = null; // Track the currently playing song
+        const playPauseIcon = document.getElementById('playPauseIcon');
 
-        // Populate the song list dynamically
-        songs.forEach(title => {
-            const li = document.createElement('li');
-            li.className = 'songItem';
-            li.dataset.title = title;
-            li.innerHTML = `
-                ${title}
-                <button class="playButton" data-title="${title}"><img src="play.png" alt="Play" /></button>
-            `;
-            songList.appendChild(li);
+        let currentlyPlaying = null; // To keep track of the currently playing song
 
-            // Event listener for song item clicks
-            li.onclick = () => openSongDetail(title);
+        songItems.forEach(item => {
+            const playButton = item.querySelector('.playButton');
+            const songFile = item.dataset.song;
+            const imageFile = item.dataset.image;
 
-            // Event listener for play button clicks
-            li.querySelector('.playButton').onclick = (e) => {
-                e.stopPropagation(); // Prevent the event from bubbling up to the item click
-                openSongDetail(title);
+            playButton.onclick = () => {
+                if (currentlyPlaying && currentlyPlaying !== songFile) {
+                    const previousItem = document.querySelector(`.songItem[data-song="${currentlyPlaying}"]`);
+                    const previousPlayButton = previousItem.querySelector('.playButton');
+                    previousPlayButton.innerText = '▶'; // Reset previous play button
+                }
+
+                if (audioPlayer.src.includes(songFile) && !audioPlayer.paused) {
+                    audioPlayer.pause();
+                    playButton.innerText = '▶'; // Change to play icon
+                    playPauseIcon.src = 'play.png'; // Update icon
+                } else {
+                    audioPlayer.src = songFile;
+                    audioPlayer.play();
+                    playButton.innerText = '⏸'; // Change to pause icon
+                    playPauseIcon.src = 'pause.png'; // Update icon
+                }
+
+                // Display song details
+                songNameDisplay.innerText = item.textContent.trim();
+                songImage.src = imageFile;
+                songDetail.style.display = 'block';
+
+                currentlyPlaying = songFile; // Update currently playing
             };
         });
 
-        const openSongDetail = (songTitle) => {
-            const songFile = `${songTitle}.mp3`; // Derive audio file name
-            const imageFile = `${songTitle}.jpg`; // Derive image file name
-
-            // Pause the currently playing song if different
-            if (currentPlayingSong && currentPlayingSong !== songFile) {
-                const previousPlayButton = document.querySelector(`.songItem[data-title="${currentPlayingSong.replace('.mp3', '')}"] .playButton img`);
-                if (previousPlayButton) {
-                    previousPlayButton.src = 'play.png'; // Reset previous play button
-                }
-            }
-
-            if (audioPlayer.src.includes(songFile) && !audioPlayer.paused) {
-                audioPlayer.pause();
-                playPauseButton.innerHTML = '<img src="play.png" alt="Play" />'; // Change to play icon
-            } else {
-                audioPlayer.src = songFile;
-                audioPlayer.play();
-                playPauseButton.innerHTML = '<img src="pause.png" alt="Pause" />'; // Change to pause icon
-                currentPlayingSong = songFile; // Track the current playing song
-            }
-
-            // Display song details
-            songNameDisplay.innerText = songTitle;
-            songImage.src = imageFile;
-            songDetail.style.display = 'flex';
-        };
-
         closeDetail.onclick = () => {
-            songDetail.style.display = 'none'; // Close the detail view without stopping the song
-        };
-
-        // Play/pause button functionality in the detail view
-        playPauseButton.onclick = () => {
-            if (audioPlayer.paused) {
-                audioPlayer.play();
-                playPauseButton.innerHTML = '<img src="pause.png" alt="Pause" />'; // Change to pause icon
-            } else {
-                audioPlayer.pause();
-                playPauseButton.innerHTML = '<img src="play.png" alt="Play" />'; // Change to play icon
-            }
-        };
-
-        // Search functionality
-        const searchInput = document.getElementById('searchInput');
-        searchInput.addEventListener('input', () => {
-            const filter = searchInput.value.toLowerCase();
-            document.querySelectorAll('.songItem').forEach(item => {
-                const songTitle = item.dataset.title.toLowerCase();
-                if (songTitle.includes(filter)) {
-                    item.style.display = ''; // Show item
-                } else {
-                    item.style.display = 'none'; // Hide item
-                }
+            audioPlayer.pause();
+            audioPlayer.src = ''; // Reset audio source
+            songDetail.style.display = 'none';
+            currentlyPlaying = null; // Reset currently playing
+            songItems.forEach(item => {
+                item.querySelector('.playButton').innerText = '▶'; // Reset play buttons
             });
+            playPauseIcon.src = 'play.png'; // Reset play icon
+        };
+
+        // Download button functionality
+        document.querySelectorAll('.downloadButton').forEach(button => {
+            button.onclick = (e) => {
+                const songFile = e.target.parentNode.dataset.song;
+                const link = document.createElement('a');
+                link.href = songFile;
+                link.download = songFile;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            };
         });
     </script>
 </body>
