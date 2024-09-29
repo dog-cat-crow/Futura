@@ -71,23 +71,24 @@
             cursor: pointer;
         }
         #songName {
-            font-size: 24px;
+            font-size: 28px; /* Increased font size for better visibility */
             text-align: center;
             margin-top: 50px;
         }
         #songImage {
-            width: 300px; /* Adjusted size */
-            height: 300px; /* Adjusted size */
+            width: 250px; /* Adjusted size for better display */
+            height: 250px; /* Adjusted size for better display */
             border-radius: 10px;
             margin: 10px auto;
             display: block;
         }
-        .playButton {
-            background: none;
-            border: none;
-            cursor: pointer;
-            display: block;
-            margin: 20px auto;
+        .playButton img {
+            width: 50px; /* Adjusted icon size */
+            height: 50px; /* Adjusted icon size */
+        }
+        .downloadButton img {
+            width: 30px; /* Adjusted icon size */
+            height: 30px; /* Adjusted icon size */
         }
     </style>
 </head>
@@ -114,6 +115,7 @@
             <button class="downloadButton"><img src="Download.png" alt="Download" /></button>
         </div>
     </div>
+
     <div id="songDetail">
         <button id="closeDetail">×</button>
         <h2 id="songName"></h2>
