@@ -49,52 +49,76 @@
         }
         #songDetail {
             display: none;
-            background-color: black;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
             padding: 20px;
-            border-radius: 10px;
-            margin: 20px;
+            box-sizing: border-box;
+            justify-content: center;
+            align-items: center;
+        }
+        #closeDetail {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            color: white;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        #songName {
+            font-size: 24px;
+            text-align: center;
+            margin-top: 50px;
         }
         #songImage {
-            width: 200px;
-            height: 200px;
+            width: 300px; /* Adjusted size */
+            height: 300px; /* Adjusted size */
             border-radius: 10px;
             margin: 10px auto;
+            display: block;
         }
-        #audioPlayer {
-            width: 100%;
-            margin-top: 10px;
+        .playButton {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
         }
     </style>
 </head>
 <body>
     <div id="searchContainer">
-        <input type="text" id="searchInput" placeholder="Search Songs..." />
+        <input type="text" id="searchInput" placeholder="Search Songs..." oninput="filterSongs()" />
         <button id="searchButton">Search</button>
     </div>
-    
+
     <div id="songList">
         <div class="songItem" data-song="alone.mp3" data-image="alone.jpg">
-            <button class="playButton">▶</button>
+            <button class="playButton"><img src="play.png" alt="Play" /></button>
             Alone Part II
-            <button class="downloadButton">⬇</button>
+            <button class="downloadButton"><img src="Download.png" alt="Download" /></button>
         </div>
         <div class="songItem" data-song="animals.mp3" data-image="animals.jpg">
-            <button class="playButton">▶</button>
+            <button class="playButton"><img src="play.png" alt="Play" /></button>
             Animals
-            <button class="downloadButton">⬇</button>
+            <button class="downloadButton"><img src="Download.png" alt="Download" /></button>
         </div>
         <div class="songItem" data-song="fly-away.mp3" data-image="fly-away.jpg">
-            <button class="playButton">▶</button>
+            <button class="playButton"><img src="play.png" alt="Play" /></button>
             Fly Away
-            <button class="downloadButton">⬇</button>
+            <button class="downloadButton"><img src="Download.png" alt="Download" /></button>
         </div>
     </div>
-
     <div id="songDetail">
+        <button id="closeDetail">×</button>
         <h2 id="songName"></h2>
         <img id="songImage" alt="Album Art" />
-        <audio id="audioPlayer" controls></audio>
-        <button id="closeDetail">Close</button>
+        <button class="playButton" id="playPauseButton"><img src="play.png" alt="Play" /></button>
     </div>
 
     <script>
@@ -102,8 +126,9 @@
         const songDetail = document.getElementById('songDetail');
         const songNameDisplay = document.getElementById('songName');
         const songImage = document.getElementById('songImage');
-        const audioPlayer = document.getElementById('audioPlayer');
         const closeDetail = document.getElementById('closeDetail');
+        const audioPlayer = new Audio(); // Create audio player instance
+        const playPauseButton = document.getElementById('playPauseButton');
 
         songItems.forEach(item => {
             const playButton = item.querySelector('.playButton');
@@ -113,17 +138,17 @@
             playButton.onclick = () => {
                 if (audioPlayer.src.includes(songFile) && !audioPlayer.paused) {
                     audioPlayer.pause();
-                    playButton.innerText = '▶'; // Change to play icon
+                    playPauseButton.innerHTML = '<img src="play.png" alt="Play" />'; // Change to play icon
                 } else {
                     audioPlayer.src = songFile;
                     audioPlayer.play();
-                    playButton.innerText = '⏸'; // Change to pause icon
+                    playPauseButton.innerHTML = '<img src="pause.png" alt="Pause" />'; // Change to pause icon
                 }
 
                 // Display song details
                 songNameDisplay.innerText = item.textContent.trim();
                 songImage.src = imageFile;
-                songDetail.style.display = 'block';
+                songDetail.style.display = 'flex';
             };
         });
 
@@ -132,7 +157,7 @@
             audioPlayer.src = ''; // Reset audio source
             songDetail.style.display = 'none';
             songItems.forEach(item => {
-                item.querySelector('.playButton').innerText = '▶'; // Reset play buttons
+                item.querySelector('.playButton').innerHTML = '<img src="play.png" alt="Play" />'; // Reset play buttons
             });
         };
 
@@ -148,6 +173,15 @@
                 document.body.removeChild(link);
             };
         });
+
+        // Filter songs based on search input
+        function filterSongs() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            songItems.forEach(item => {
+                const songName = item.textContent.toLowerCase();
+                item.style.display = songName.includes(searchInput) ? 'flex' : 'none';
+            });
+        }
     </script>
 </body>
 </html>
