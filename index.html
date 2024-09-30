@@ -115,149 +115,135 @@
         <audio id="audioPlayer" controls></audio>
     </div>
     <script>
-const songTitles = ["A", "B", "C", "D"]; // List of song titles
+    fetch('songs.json')
+        .then(response => response.json())
+        .then(data => {
+            const songTitles = data.songs; // Load songs from JSON
 
-const songList = document.getElementById('songList');
-const songDetail = document.getElementById('songDetail');
-const songNameDisplay = document.getElementById('songName');
-const songImage = document.getElementById('songImage');
-const audioPlayer = document.getElementById('audioPlayer');
-const closeDetail = document.getElementById('closeDetail');
-const playPauseButton = document.getElementById('playPauseButton');
-const playPauseIcon = document.getElementById('playPauseIcon');
+            const songList = document.getElementById('songList');
+            const songDetail = document.getElementById('songDetail');
+            const songNameDisplay = document.getElementById('songName');
+            const songImage = document.getElementById('songImage');
+            const audioPlayer = document.getElementById('audioPlayer');
+            const closeDetail = document.getElementById('closeDetail');
+            const playPauseButton = document.getElementById('playPauseButton');
+            const playPauseIcon = document.getElementById('playPauseIcon');
 
-let currentlyPlaying = null;
-let isMuted = false; // Mute state tracking
+            let currentlyPlaying = null;
+            let isMuted = false; // Mute state tracking
 
-// Function to set the labels of all play buttons in the menu
-function setMenuPlayButtonLabels() {
-    songTitles.forEach((title) => {
-        const playButton = document.getElementById(`${title}play`);
-        if (playButton) {
-            playButton.setAttribute('aria-label', title); // Set the label as the song title
-        }
-    });
-}
+            songTitles.forEach(({ title, file, image }) => {
+                const songItem = document.createElement('div');
+                songItem.classList.add('songItem');
+                songItem.dataset.song = file;
+                songItem.dataset.image = image;
 
-// Call this function immediately when the website opens
-setMenuPlayButtonLabels();
+                const playButton = document.createElement('button');
+                playButton.classList.add('playButton');
+                playButton.setAttribute('id', `${title}play`); // Assign unique ID e.g., Aplay, Bplay, etc.
+                playButton.innerHTML = `<img src="play.png" alt="Play" width="18px" />`;
 
-songTitles.forEach((title) => {
-    const songFile = `${title}.mp3`;
-    const songImageFile = `${title}.jpg`;
+                const songTitle = document.createElement('span');
+                songTitle.classList.add('songTitle');
+                songTitle.innerText = title;
 
-    const songItem = document.createElement('div');
-    songItem.classList.add('songItem');
-    songItem.dataset.song = songFile;
-    songItem.dataset.image = songImageFile;
+                // Add event listener for the play button
+                playButton.onclick = () => {
+                    if (audioPlayer.src.includes(file) && !audioPlayer.paused) {
+                        audioPlayer.pause();
+                        playButton.querySelector('img').src = 'play.png';
+                    } else {
+                        if (currentlyPlaying !== title) {
+                            const previousItem = document.querySelector(`.playButton[id="${currentlyPlaying}play"]`);
+                            if (previousItem) {
+                                previousItem.querySelector('img').src = 'play.png'; // Reset previous play button
+                            }
+                            audioPlayer.src = file; // Load the new song
+                            currentlyPlaying = title; // Update currently playing song
+                        }
+                        audioPlayer.play().catch(error => {
+                            console.error('Error playing the audio:', error);
+                        });
+                        playButton.querySelector('img').src = 'pause.png';
+                    }
+                };
 
-    // Create a unique play button ID for each song
-    const playButton = document.createElement('button');
-    playButton.classList.add('playButton');
-    playButton.setAttribute('id', `${title}play`); // Assign unique ID e.g., Aplay, Bplay, etc.
-    playButton.innerHTML = `<img src="play.png" alt="Play" width="18px" />`;
+                // Event listener for opening the player UI
+                songTitle.onclick = () => {
+                    songNameDisplay.innerText = title;      // Set song name display
+                    songImage.src = image;                  // Set song image
+                    playPauseIcon.src = 'play.png';         // Reset to the play icon
+                    playPauseButton.setAttribute('aria-label', title); // Independently set label with song title
+                    songDetail.style.display = 'block';      // Show the song detail window
 
-    const songTitle = document.createElement('span');
-    songTitle.classList.add('songTitle');
-    songTitle.innerText = title;
+                    // Load the selected song into the audioPlayer without autoplay
+                    audioPlayer.src = file;
+                };
 
-    // Add event listener for the play button
-    playButton.onclick = () => {
-        // Syncing the window player state with the menu button
-        if (audioPlayer.src.includes(songFile) && !audioPlayer.paused) {
-            audioPlayer.pause();
-            playButton.querySelector('img').src = 'play.png';
-        } else {
-            if (currentlyPlaying !== title) {
-                const previousItem = document.querySelector(`.playButton[id="${currentlyPlaying}play"]`);
-                if (previousItem) {
-                    previousItem.querySelector('img').src = 'play.png'; // Reset previous play button
-                }
-                audioPlayer.src = songFile; // Load the new song
-                currentlyPlaying = title; // Update currently playing song
-            }
-            audioPlayer.play().catch(error => {
-                console.error('Error playing the audio:', error);
+                songItem.appendChild(playButton);
+                songItem.appendChild(songTitle);
+                songList.appendChild(songItem);
             });
-            playButton.querySelector('img').src = 'pause.png';
-        }
-    };
 
-    // Event listener for opening the player UI
-    songTitle.onclick = () => {
-        songNameDisplay.innerText = title;      // Set song name display
-        songImage.src = songImageFile;          // Set song image
-        playPauseIcon.src = 'play.png';         // Reset to the play icon
-        playPauseButton.setAttribute('aria-label', title); // Independently set label with song title
-        songDetail.style.display = 'block';      // Show the song detail window
+            // Event listener to close the detail UI
+            closeDetail.onclick = () => {
+                songDetail.style.display = 'none';
+            };
 
-        // Load the selected song into the audioPlayer without autoplay
-        audioPlayer.src = songFile;
-    };
+            // Control the play/pause button inside the player window UI
+            playPauseButton.onclick = () => {
+                if (audioPlayer.paused) {
+                    audioPlayer.play().catch(error => {
+                        console.error('Error playing the audio:', error);
+                    });
+                    playPauseIcon.src = 'pause.png';
 
-    songItem.appendChild(playButton);
-    songItem.appendChild(songTitle);
-    songList.appendChild(songItem);
-});
+                    // Sync window button with the current song
+                    const currentMenuButton = document.querySelector(`.playButton[id="${currentlyPlaying}play"]`);
+                    if (currentMenuButton) {
+                        currentMenuButton.querySelector('img').src = 'pause.png';
+                    }
+                } else {
+                    audioPlayer.pause();
+                    playPauseIcon.src = 'play.png';
 
-// Event listener to close the detail UI
-closeDetail.onclick = () => {
-    songDetail.style.display = 'none';
-};
+                    // Sync window button with the current song
+                    const currentMenuButton = document.querySelector(`.playButton[id="${currentlyPlaying}play"]`);
+                    if (currentMenuButton) {
+                        currentMenuButton.querySelector('img').src = 'play.png';
+                    }
+                }
+            };
 
-// Control the play/pause button inside the player window UI
-playPauseButton.onclick = () => {
-    if (audioPlayer.paused) {
-        audioPlayer.play().catch(error => {
-            console.error('Error playing the audio:', error);
+            // Add reset button functionality
+            const resetButton = document.createElement('button');
+            resetButton.setAttribute('id', 'resetButton');
+            resetButton.innerHTML = `<img src="reset.png" alt="Reset" width="30px" style="margin-right: 10px;" />`;
+            resetButton.onclick = () => {
+                audioPlayer.currentTime = 0; // Reset to the beginning
+                audioPlayer.play().catch(error => {
+                    console.error('Error playing the audio:', error);
+                });
+            };
+            songDetail.appendChild(resetButton);
+
+            // Add mute/unmute button functionality
+            const muteButton = document.createElement('button');
+            muteButton.setAttribute('id', 'muteButton');
+            muteButton.innerHTML = `<img src="mute.png" alt="Mute" width="30px" style="margin-right: 10px;" />`;
+            muteButton.onclick = () => {
+                if (!isMuted) {
+                    audioPlayer.volume = 0; // Mute the audio
+                    muteButton.innerHTML = `<img src="unmute.png" alt="Unmute" width="30px" style="margin-right: 10px;" />`;
+                    isMuted = true;
+                } else {
+                    audioPlayer.volume = 1; // Unmute the audio
+                    muteButton.innerHTML = `<img src="mute.png" alt="Mute" width="30px" style="margin-right: 10px;" />`;
+                    isMuted = false;
+                }
+            };
+            songDetail.appendChild(muteButton);
         });
-        playPauseIcon.src = 'pause.png';
-        
-        // Sync window button with the current song
-        const currentMenuButton = document.querySelector(`.playButton[id="${currentlyPlaying}play"]`);
-        if (currentMenuButton) {
-            currentMenuButton.querySelector('img').src = 'pause.png';
-        }
-    } else {
-        audioPlayer.pause();
-        playPauseIcon.src = 'play.png';
-        
-        // Sync window button with the current song
-        const currentMenuButton = document.querySelector(`.playButton[id="${currentlyPlaying}play"]`);
-        if (currentMenuButton) {
-            currentMenuButton.querySelector('img').src = 'play.png';
-        }
-    }
-};
-
-// Add reset button functionality
-const resetButton = document.createElement('button');
-resetButton.setAttribute('id', 'resetButton');
-resetButton.innerHTML = `<img src="reset.png" alt="Reset" width="30px" style="margin-right: 10px;" />`;
-resetButton.onclick = () => {
-    audioPlayer.currentTime = 0; // Reset to the beginning
-    audioPlayer.play().catch(error => {
-        console.error('Error playing the audio:', error);
-    });
-};
-songDetail.appendChild(resetButton);
-
-// Add mute/unmute button functionality
-const muteButton = document.createElement('button');
-muteButton.setAttribute('id', 'muteButton');
-muteButton.innerHTML = `<img src="mute.png" alt="Mute" width="30px" style="margin-right: 10px;" />`;
-muteButton.onclick = () => {
-    if (!isMuted) {
-        audioPlayer.volume = 0; // Mute the audio
-        muteButton.innerHTML = `<img src="unmute.png" alt="Unmute" width="30px" style="margin-right: 10px;" />`;
-        isMuted = true;
-    } else {
-        audioPlayer.volume = 1; // Unmute the audio
-        muteButton.innerHTML = `<img src="mute.png" alt="Mute" width="30px" style="margin-right: 10px;" />`;
-        isMuted = false;
-    }
-};
-songDetail.appendChild(muteButton);
 </script>
 </body>
 </html>
