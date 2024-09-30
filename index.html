@@ -122,7 +122,7 @@
     </div>
     
     <script>
-fetch('songs.json')
+        fetch('songs.json')
     .then(response => response.json())
     .then(data => {
         const songTitles = data.songs; // Load songs from JSON
@@ -225,34 +225,28 @@ fetch('songs.json')
             }
         };
 
-        // Add reset button functionality
-const resetButton = document.createElement('button');
-resetButton.setAttribute('id', 'resetButton');
-resetButton.innerHTML = `<img src="reset.png" alt="Reset" width="30px" style="margin-right: 10px;" />`;
-resetButton.onclick = () => {
-    audioPlayer.currentTime = 0; // Reset to the beginning
-    audioPlayer.play().catch(error => {
-        console.error('Error playing the audio:', error);
-    });
-};
-songDetail.appendChild(resetButton); // Append normally
+        // Reset button functionality
+        const resetButton = document.getElementById('resetButton');
+        resetButton.onclick = () => {
+            audioPlayer.currentTime = 0; // Reset to the beginning
+            audioPlayer.play().catch(error => {
+                console.error('Error playing the audio:', error);
+            });
+        };
 
-// Add mute/unmute button functionality
-const muteButton = document.createElement('button');
-muteButton.setAttribute('id', 'muteButton');
-muteButton.innerHTML = `<img src="mute.png" alt="Mute" width="30px" style="margin-right: 10px;" />`;
-muteButton.onclick = () => {
-    if (!isMuted) {
-        audioPlayer.volume = 0; // Mute the audio
-        muteButton.innerHTML = `<img src="unmute.png" alt="Unmute" width="30px" style="margin-right: 10px;" />`;
-        isMuted = true;
-    } else {
-        audioPlayer.volume = 1; // Unmute the audio
-        muteButton.innerHTML = `<img src="mute.png" alt="Mute" width="30px" style="margin-right: 10px;" />`;
-        isMuted = false;
-    }
-};
-songDetail.appendChild(muteButton); // Append normally
+        // Mute/unmute button functionality
+        const muteButton = document.getElementById('muteButton');
+        muteButton.onclick = () => {
+            if (!isMuted) {
+                audioPlayer.volume = 0; // Mute the audio
+                muteButton.innerHTML = `<img src="unmute.png" alt="Unmute" width="30px" style="margin-right: 10px;" />`;
+                isMuted = true;
+            } else {
+                audioPlayer.volume = 1; // Unmute the audio
+                muteButton.innerHTML = `<img src="mute.png" alt="Mute" width="30px" style="margin-right: 10px;" />`;
+                isMuted = false;
+            }
+        };
     })
     .catch(error => {
         console.error('Error fetching songs:', error);
