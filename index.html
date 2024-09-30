@@ -74,16 +74,23 @@
             margin-left: auto;
             margin-right: auto;
         }
-        #playPauseButton {
+        #playPauseButton, #resetButton, #muteButton {
             margin-top: 15px; /* Updated alignment from 40px to 15px */
             width: 30px; /* Adjusted width */
             height: 30px; /* Adjusted height */
             display: block;
-            margin-left: auto;
-            margin-right: auto;
             background: transparent;
             border: none;
             cursor: pointer;
+            position: relative; /* Position relative to enable left positioning */
+        }
+        #resetButton {
+            position: absolute;
+            left: -40px; /* 40 pixels to the left of the play/pause button */
+        }
+        #muteButton {
+            position: absolute;
+            left: -80px; /* Adjusted to position accordingly */
         }
         #playPauseIcon {
             max-width: 30px; /* Set maximum width for the icon */
@@ -120,6 +127,7 @@ const playPauseButton = document.getElementById('playPauseButton');
 const playPauseIcon = document.getElementById('playPauseIcon');
 
 let currentlyPlaying = null;
+let isMuted = false; // Mute state tracking
 
 // Function to set the labels of all play buttons in the menu
 function setMenuPlayButtonLabels() {
@@ -221,6 +229,35 @@ playPauseButton.onclick = () => {
         }
     }
 };
+
+// Add reset button functionality
+const resetButton = document.createElement('button');
+resetButton.setAttribute('id', 'resetButton');
+resetButton.innerHTML = `<img src="reset.png" alt="Reset" width="30px" style="margin-right: 10px;" />`;
+resetButton.onclick = () => {
+    audioPlayer.currentTime = 0; // Reset to the beginning
+    audioPlayer.play().catch(error => {
+        console.error('Error playing the audio:', error);
+    });
+};
+songDetail.appendChild(resetButton);
+
+// Add mute/unmute button functionality
+const muteButton = document.createElement('button');
+muteButton.setAttribute('id', 'muteButton');
+muteButton.innerHTML = `<img src="mute.png" alt="Mute" width="30px" style="margin-right: 10px;" />`;
+muteButton.onclick = () => {
+    if (!isMuted) {
+        audioPlayer.volume = 0; // Mute the audio
+        muteButton.innerHTML = `<img src="unmute.png" alt="Unmute" width="30px" style="margin-right: 10px;" />`;
+        isMuted = true;
+    } else {
+        audioPlayer.volume = 1; // Unmute the audio
+        muteButton.innerHTML = `<img src="mute.png" alt="Mute" width="30px" style="margin-right: 10px;" />`;
+        isMuted = false;
+    }
+};
+songDetail.appendChild(muteButton);
 </script>
 </body>
 </html>
