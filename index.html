@@ -121,6 +121,19 @@ const playPauseIcon = document.getElementById('playPauseIcon');
 
 let currentlyPlaying = null;
 
+// Function to set the labels of all play buttons in the menu
+function setMenuPlayButtonLabels() {
+    songTitles.forEach((title) => {
+        const playButton = document.getElementById(`${title}play`);
+        if (playButton) {
+            playButton.setAttribute('aria-label', title); // Set the label as the song title
+        }
+    });
+}
+
+// Call this function immediately when the website opens
+setMenuPlayButtonLabels();
+
 songTitles.forEach((title) => {
     const songFile = `${title}.mp3`;
     const songImageFile = `${title}.jpg`;
@@ -166,7 +179,7 @@ songTitles.forEach((title) => {
         songNameDisplay.innerText = title;      // Set song name display
         songImage.src = songImageFile;          // Set song image
         playPauseIcon.src = 'play.png';         // Reset to the play icon
-        playPauseButton.setAttribute('aria-label', title); // Label the play/pause button with the song title
+        playPauseButton.setAttribute('aria-label', title); // Independently set label with song title
         songDetail.style.display = 'block';      // Show the song detail window
     };
 
@@ -190,6 +203,7 @@ playPauseButton.onclick = () => {
         playPauseIcon.src = 'pause.png';
     }
 };
- </script>
+</script>
+
 </body>
 </html>
