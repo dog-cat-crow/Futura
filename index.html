@@ -86,8 +86,7 @@
             cursor: pointer;
         }
         #audioPlayer {
-            width: 100%;
-            margin-top: 10px;
+            display: none;
         }
     </style>
 </head>
@@ -106,7 +105,7 @@
     </div>
 
     <script>
-        const songTitles = ["A", "B", "C", "D"]; // List of song titles
+        const songTitles = ["A", "B", "C", "D"];
 
         const songList = document.getElementById('songList');
         const songDetail = document.getElementById('songDetail');
@@ -120,8 +119,8 @@
         let currentlyPlaying = null;
 
         songTitles.forEach(title => {
-            const songFile = `${title}.mp3`;  // Derived song file
-            const songImageFile = `${title}.jpg`;  // Derived song image
+            const songFile = `${title}.mp3`;
+            const songImageFile = `${title}.jpg`;
 
             const songItem = document.createElement('div');
             songItem.classList.add('songItem');
@@ -136,7 +135,6 @@
             songTitle.classList.add('songTitle');
             songTitle.innerText = title;
 
-            // Play button functionality (directly play without opening UI)
             playButton.onclick = () => {
                 if (audioPlayer.src.includes(songFile) && !audioPlayer.paused) {
                     audioPlayer.pause();
@@ -154,7 +152,6 @@
                 }
             };
 
-            // Song title functionality (open UI)
             songTitle.onclick = () => {
                 songNameDisplay.innerText = title;
                 songImage.src = songImageFile;
@@ -168,6 +165,16 @@
 
         closeDetail.onclick = () => {
             songDetail.style.display = 'none';
+        };
+
+        playPauseButton.onclick = () => {
+            if (!audioPlayer.paused) {
+                audioPlayer.pause();
+                playPauseIcon.src = 'play.png';
+            } else {
+                audioPlayer.play();
+                playPauseIcon.src = 'pause.png';
+            }
         };
     </script>
 </body>
