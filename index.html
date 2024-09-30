@@ -75,15 +75,19 @@
             margin-right: auto;
         }
         #playPauseButton {
-            margin-top: 40px;
-            width: 40px;
-            height: 40px;
+            margin-top: 15px; /* Updated alignment from 40px to 15px */
+            width: 30px; /* Adjusted width */
+            height: 30px; /* Adjusted height */
             display: block;
             margin-left: auto;
             margin-right: auto;
             background: transparent;
             border: none;
             cursor: pointer;
+        }
+        #playPauseIcon {
+            max-width: 30px; /* Set maximum width for the icon */
+            max-height: 30px; /* Set maximum height for the icon */
         }
         #audioPlayer {
             display: none;
@@ -103,7 +107,6 @@
         </button>
         <audio id="audioPlayer" controls></audio>
     </div>
-
     <script>
     const songTitles = ["A", "B", "C", "D"]; // List of song titles
 
@@ -185,6 +188,6 @@
             playPauseIcon.src = 'pause.png';
         }
     };
-</script>
+    </script>
 </body>
 </html>
