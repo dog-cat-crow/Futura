@@ -176,6 +176,31 @@
                 playPauseIcon.src = 'pause.png';
             }
         };
+
+        // Script to check which title's button is clicked and trigger the respective song
+        songList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('playButton')) {
+                const songItem = e.target.closest('.songItem');
+                const songFile = songItem.dataset.song;
+
+                if (audioPlayer.src.includes(songFile) && !audioPlayer.paused) {
+                    audioPlayer.pause();
+                    e.target.querySelector('img').src = 'play.png';
+                } else {
+                    audioPlayer.src = songFile;
+                    audioPlayer.play();
+                    e.target.querySelector('img').src = 'pause.png';
+                    
+                    if (currentlyPlaying && currentlyPlaying !== songFile) {
+                        const previousItem = document.querySelector(`.songItem[data-song="${currentlyPlaying}"]`);
+                        const previousPlayButton = previousItem.querySelector('.playButton img');
+                        previousPlayButton.src = 'play.png';
+                    }
+
+                    currentlyPlaying = songFile;
+                }
+            }
+        });
     </script>
 </body>
 </html>
