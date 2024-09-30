@@ -43,18 +43,16 @@
         flex-grow: 1;
         text-align: center;
     }
-    #songDetail {
-        padding: 35px;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: rgba(0, 0, 0, 0.8);
-        border-radius: 10px;
-        width: 100%; /* Ensure the player fits the horizontal screen size */
-        max-width: 400px; /* Optional: Set a max width for usability */
-        display: none;
-    }
+        #songDetail {
+    padding: 0; /* Remove padding to use full screen */
+    position: fixed;
+    top: 0; /* Align to top */
+    left: 0; /* Align to left */
+    width: 100vw; /* Use full viewport width */
+    height: 100vh; /* Use full viewport height */
+    background-color: #303030; /* Set opaque background color */
+    display: none; /* Still hidden by default */
+        }
     #closeDetail {
         position: absolute;
         top: 10px;
