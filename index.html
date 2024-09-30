@@ -5,125 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mobile MP3 Player</title>
     <style>
-    body {
-        background-color: #333;
-        color: white;
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-    }
-    #songList {
-        padding: 10px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    .songItem {
-        background-color: black;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 90%;
-        padding: 10px;
-        margin: 5px 0;
-    }
-    .playButton {
-        background-color: transparent;
-        border: none;
-        color: white;
-        font-size: 18px;
-        cursor: pointer;
-        margin-right: 15px;
-    }
-    .songTitle {
-        text-decoration: underline;
-        cursor: pointer;
-        font-size: 20px;
-        flex-grow: 1;
-        text-align: center;
-    }
-        #songDetail {
-    padding: 0; /* Remove padding to use full screen */
-    position: fixed;
-    top: 0; /* Align to top */
-    left: 0; /* Align to left */
-    width: 100vw; /* Use full viewport width */
-    height: 100vh; /* Use full viewport height */
-    background-color: #303030; /* Set opaque background color */
-    display: none; /* Still hidden by default */
+        body {
+            background-color: #333;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
         }
-    #closeDetail {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        font-size: 25px;
-        cursor: pointer;
-    }
-    #songName {
-        margin-top: 35px;
-        text-align: center;
-        font-size: 24px;
-    }
-    #songImage {
-        margin-top: 30px;
-        width: 180px;
-        height: 180px;
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-    }
-/* Existing styles */
-#playPauseButton {
-    position: absolute; /* Use absolute positioning */
-    top: 300px; /* Set to 280 pixels from the top */
-    left: 50%; /* Position to the center of the screen */
-    transform: translateX(-50%); /* Shift left by half its width to center it */
-    width: 50px; /* Set width to 50 pixels */
-    height: 50px; /* Set height to 50 pixels */
-    background: transparent; /* Keep background transparent */
-    border: none; /* Remove border */
-    cursor: pointer; /* Change cursor on hover */
-}
-#playPauseIcon {
-    max-width: 70px; /* Increased maximum width */
-    max-height: 70px; /* Increased maximum height */
-}
-/* Reset and Mute Button Styles */
-#resetButton {
-    position: absolute; /* Use absolute positioning */
-    top: 300px; /* Align with the play/pause button vertically */
-    left: 60px; /* 60px from the left edge */
-    border: none; /* Remove border */
-    background: transparent; /* Keep background transparent */
-    cursor: pointer; /* Change cursor to pointer on hover */
-}
-#muteButton {
-    position: absolute; /* Use absolute positioning */
-    top: 300px; /* Align with the play/pause button vertically */
-    right: 60px; /* 60px from the right edge */
-    border: none; /* Remove border */
-    background: transparent; /* Keep background transparent */
-    cursor: pointer; /* Change cursor to pointer on hover */
-}
-    #audioPlayer {
-        display: none;
-    }
+        #songList {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .songItem {
+            background-color: black;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 90%;
+            padding: 10px;
+            margin: 5px 0;
+        }
+        .playButton {
+            background-color: transparent;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+        .songTitle {
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 20px;
+            flex-grow: 1;
+            text-align: center;
+        }
+        #songDetail {
+            padding: 0; /* Remove padding to use full screen */
+            position: fixed;
+            top: 0; /* Align to top */
+            left: 0; /* Align to left */
+            width: 100vw; /* Use full viewport width */
+            height: 100vh; /* Use full viewport height */
+            background-color: #303030; /* Set opaque background color */
+            display: none; /* Still hidden by default */
+        }
+        #closeDetail {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 25px;
+            cursor: pointer;
+        }
+        #songName {
+            margin-top: 35px;
+            text-align: center;
+            font-size: 24px;
+        }
+        #songImage {
+            margin-top: 30px;
+            width: 180px;
+            height: 180px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
         #buttonContainer {
-    position: absolute;
-    top: 300px; /* Align buttons vertically */
-    left: 0; /* Start from the left */
-    right: 0; /* Extend to the right */
-    display: flex; /* Use flexbox */
-    justify-content: space-between; /* Distribute space evenly */
-    padding: 0 60px; /* 60px padding on left and right */
-}
-#playPauseButton {
-    background: transparent; /* Keep background transparent */
-    border: none; /* Remove border */
-    cursor: pointer; /* Change cursor on hover */
-}
-        </style>
+            position: absolute; /* Position it absolutely */
+            top: 300px; /* Align buttons vertically */
+            left: 0; /* Start from the left */
+            right: 0; /* Extend to the right */
+            display: flex; /* Use flexbox for layout */
+            justify-content: space-between; /* Distribute buttons evenly */
+            padding: 0 60px; /* 60px padding on left and right */
+        }
+        #playPauseButton, #resetButton, #muteButton {
+            background: transparent; /* Keep background transparent */
+            border: none; /* Remove border */
+            cursor: pointer; /* Change cursor on hover */
+            display: flex; /* Flex to center icon */
+            align-items: center; /* Center vertically */
+            justify-content: center; /* Center horizontally */
+        }
+        #playPauseIcon {
+            max-width: 70px; /* Maximum width for the icon */
+            max-height: 70px; /* Maximum height for the icon */
+        }
+        #audioPlayer {
+            display: none;
+        }
+    </style>
 </head>
 <body>
     
