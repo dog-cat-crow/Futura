@@ -181,6 +181,12 @@ songTitles.forEach((title) => {
         playPauseIcon.src = 'play.png';         // Reset to the play icon
         playPauseButton.setAttribute('aria-label', title); // Independently set label with song title
         songDetail.style.display = 'block';      // Show the song detail window
+
+        // Load and play the selected song when the song title is clicked
+        audioPlayer.src = songFile;
+        audioPlayer.play().catch(error => {
+            console.error('Error playing the audio:', error);
+        });
     };
 
     songItem.appendChild(playButton);
@@ -204,6 +210,7 @@ playPauseButton.onclick = () => {
     }
 };
 </script>
+
 
 </body>
 </html>
