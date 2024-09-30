@@ -75,16 +75,15 @@
     }
 /* Existing styles */
 #playPauseButton {
-    position: absolute;
-    top: 280px;
-    left: 50%; /* Center horizontally */
-    width: 70px; /* Increased width */
-    height: 70px; /* Increased height */
-    background: transparent;
-    border: none;
-    cursor: pointer;
+    position: absolute; /* Use absolute positioning */
+    top: 280px; /* Set to 280 pixels from the top */
+    left: calc(50% - 25px); /* Centering the button by adjusting for half its width */
+    width: 50px; /* Set width to 50 pixels */
+    height: 50px; /* Set height to 50 pixels */
+    background: transparent; /* Keep background transparent */
+    border: none; /* Remove border */
+    cursor: pointer; /* Change cursor on hover */
 }
-
 #playPauseIcon {
     max-width: 50px; /* Increased maximum width */
     max-height: 50px; /* Increased maximum height */
