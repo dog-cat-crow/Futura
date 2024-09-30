@@ -74,24 +74,30 @@
             margin-left: auto;
             margin-right: auto;
         }
-        #playPauseButton, #resetButton, #muteButton {
-            margin-top: 15px; /* Updated alignment from 40px to 15px */
-            width: 30px; /* Adjusted width */
-            height: 30px; /* Adjusted height */
-            display: block;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            position: relative; /* Position relative to enable left positioning */
-        }
-        #resetButton {
-            position: absolute;
-            left: -40px; /* 40 pixels to the left of the play/pause button */
-        }
-        #muteButton {
-            position: absolute;
-            left: -80px; /* Adjusted to position accordingly */
-        }
+        #playPauseButton {
+    margin: 15px auto; /* Center the play/pause button */
+    display: block;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+#resetButton {
+    margin: 15px auto; /* Center the reset button */
+    display: inline-block;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+#muteButton {
+    margin: 15px auto; /* Center the mute/unmute button */
+    display: inline-block;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+        
         #playPauseIcon {
             max-width: 30px; /* Set maximum width for the icon */
             max-height: 30px; /* Set maximum height for the icon */
@@ -220,33 +226,33 @@ fetch('songs.json')
         };
 
         // Add reset button functionality
-        const resetButton = document.createElement('button');
-        resetButton.setAttribute('id', 'resetButton');
-        resetButton.innerHTML = `<img src="reset.png" alt="Reset" width="30px" style="margin-right: 10px;" />`;
-        resetButton.onclick = () => {
-            audioPlayer.currentTime = 0; // Reset to the beginning
-            audioPlayer.play().catch(error => {
-                console.error('Error playing the audio:', error);
-            });
-        };
-        songDetail.appendChild(resetButton);
+const resetButton = document.createElement('button');
+resetButton.setAttribute('id', 'resetButton');
+resetButton.innerHTML = `<img src="reset.png" alt="Reset" width="30px" style="margin-right: 10px;" />`;
+resetButton.onclick = () => {
+    audioPlayer.currentTime = 0; // Reset to the beginning
+    audioPlayer.play().catch(error => {
+        console.error('Error playing the audio:', error);
+    });
+};
+songDetail.appendChild(resetButton); // Append normally
 
-        // Add mute/unmute button functionality
-        const muteButton = document.createElement('button');
-        muteButton.setAttribute('id', 'muteButton');
+// Add mute/unmute button functionality
+const muteButton = document.createElement('button');
+muteButton.setAttribute('id', 'muteButton');
+muteButton.innerHTML = `<img src="mute.png" alt="Mute" width="30px" style="margin-right: 10px;" />`;
+muteButton.onclick = () => {
+    if (!isMuted) {
+        audioPlayer.volume = 0; // Mute the audio
+        muteButton.innerHTML = `<img src="unmute.png" alt="Unmute" width="30px" style="margin-right: 10px;" />`;
+        isMuted = true;
+    } else {
+        audioPlayer.volume = 1; // Unmute the audio
         muteButton.innerHTML = `<img src="mute.png" alt="Mute" width="30px" style="margin-right: 10px;" />`;
-        muteButton.onclick = () => {
-            if (!isMuted) {
-                audioPlayer.volume = 0; // Mute the audio
-                muteButton.innerHTML = `<img src="unmute.png" alt="Unmute" width="30px" style="margin-right: 10px;" />`;
-                isMuted = true;
-            } else {
-                audioPlayer.volume = 1; // Unmute the audio
-                muteButton.innerHTML = `<img src="mute.png" alt="Mute" width="30px" style="margin-right: 10px;" />`;
-                isMuted = false;
-            }
-        };
-        songDetail.appendChild(muteButton);
+        isMuted = false;
+    }
+};
+songDetail.appendChild(muteButton); // Append normally
     })
     .catch(error => {
         console.error('Error fetching songs:', error);
