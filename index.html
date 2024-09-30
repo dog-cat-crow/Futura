@@ -5,107 +5,101 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mobile MP3 Player</title>
     <style>
-        body {
-            background-color: #333;
-            color: white;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-        #songList {
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .songItem {
-            background-color: black;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 90%;
-            padding: 10px;
-            margin: 5px 0;
-        }
-        .playButton {
-            background-color: transparent;
-            border: none;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            margin-right: 15px;
-        }
-        .songTitle {
-            text-decoration: underline;
-            cursor: pointer;
-            font-size: 20px;
-            flex-grow: 1;
-            text-align: center;
-        }
-        #songDetail {
-            padding: 35px;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.8);
-            border-radius: 10px;
-            width: 300px;
-            display: none;
-        }
-        #closeDetail {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 25px;
-            cursor: pointer;
-        }
-        #songName {
-            margin-top: 35px;
-            text-align: center;
-            font-size: 24px;
-        }
-        #songImage {
-            margin-top: 30px;
-            width: 120px;
-            height: 120px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        #playPauseButton {
-    margin: 15px auto; /* Center the play/pause button */
-    display: block;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-}
-
-#resetButton {
-    margin: 15px auto; /* Center the reset button */
-    display: inline-block;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-}
-
-#muteButton {
-    margin: 15px auto; /* Center the mute/unmute button */
-    display: inline-block;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-}
-        
-        #playPauseIcon {
-            max-width: 30px; /* Set maximum width for the icon */
-            max-height: 30px; /* Set maximum height for the icon */
-        }
-        #audioPlayer {
-            display: none;
-        }
-    </style>
+    body {
+        background-color: #333;
+        color: white;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+    #songList {
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .songItem {
+        background-color: black;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 90%;
+        padding: 10px;
+        margin: 5px 0;
+    }
+    .playButton {
+        background-color: transparent;
+        border: none;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+        margin-right: 15px;
+    }
+    .songTitle {
+        text-decoration: underline;
+        cursor: pointer;
+        font-size: 20px;
+        flex-grow: 1;
+        text-align: center;
+    }
+    #songDetail {
+        padding: 35px;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.8);
+        border-radius: 10px;
+        width: 100%; /* Ensure the player fits the horizontal screen size */
+        max-width: 400px; /* Optional: Set a max width for usability */
+        display: none;
+    }
+    #closeDetail {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 25px;
+        cursor: pointer;
+    }
+    #songName {
+        margin-top: 35px;
+        text-align: center;
+        font-size: 24px;
+    }
+    #songImage {
+        margin-top: 30px;
+        width: 120px;
+        height: 120px;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    #playPauseButton {
+        margin: 15px auto; /* Center the play/pause button */
+        display: block;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+    }
+    #resetButton, #muteButton {
+        position: absolute; /* Use absolute positioning */
+        top: 15px; /* Align with the play/pause button vertically */
+    }
+    #resetButton {
+        left: 60px; /* 60px from the left edge */
+    }
+    #muteButton {
+        right: 60px; /* 60px from the right edge */
+    }
+    #playPauseIcon {
+        max-width: 30px; /* Set maximum width for the icon */
+        max-height: 30px; /* Set maximum height for the icon */
+    }
+    #audioPlayer {
+        display: none;
+    }
+        </style>
 </head>
 <body>
     
