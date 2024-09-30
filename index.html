@@ -108,86 +108,88 @@
         <audio id="audioPlayer" controls></audio>
     </div>
     <script>
-    const songTitles = ["A", "B", "C", "D"]; // List of song titles
+const songTitles = ["A", "B", "C", "D"]; // List of song titles
 
-    const songList = document.getElementById('songList');
-    const songDetail = document.getElementById('songDetail');
-    const songNameDisplay = document.getElementById('songName');
-    const songImage = document.getElementById('songImage');
-    const audioPlayer = document.getElementById('audioPlayer');
-    const closeDetail = document.getElementById('closeDetail');
-    const playPauseButton = document.getElementById('playPauseButton');
-    const playPauseIcon = document.getElementById('playPauseIcon');
+const songList = document.getElementById('songList');
+const songDetail = document.getElementById('songDetail');
+const songNameDisplay = document.getElementById('songName');
+const songImage = document.getElementById('songImage');
+const audioPlayer = document.getElementById('audioPlayer');
+const closeDetail = document.getElementById('closeDetail');
+const playPauseButton = document.getElementById('playPauseButton');
+const playPauseIcon = document.getElementById('playPauseIcon');
 
-    let currentlyPlaying = null;
+let currentlyPlaying = null;
 
-    songTitles.forEach((title) => {
-        const songFile = `${title}.mp3`;
-        const songImageFile = `${title}.jpg`;
+songTitles.forEach((title) => {
+    const songFile = `${title}.mp3`;
+    const songImageFile = `${title}.jpg`;
 
-        const songItem = document.createElement('div');
-        songItem.classList.add('songItem');
-        songItem.dataset.song = songFile;
-        songItem.dataset.image = songImageFile;
+    const songItem = document.createElement('div');
+    songItem.classList.add('songItem');
+    songItem.dataset.song = songFile;
+    songItem.dataset.image = songImageFile;
 
-        // Create a unique play button ID for each song
-        const playButton = document.createElement('button');
-        playButton.classList.add('playButton');
-        playButton.setAttribute('id', `${title}play`); // Assign unique ID e.g., Aplay, Bplay, etc.
-        playButton.innerHTML = `<img src="play.png" alt="Play" width="18px" />`;
+    // Create a unique play button ID for each song
+    const playButton = document.createElement('button');
+    playButton.classList.add('playButton');
+    playButton.setAttribute('id', `${title}play`); // Assign unique ID e.g., Aplay, Bplay, etc.
+    playButton.innerHTML = `<img src="play.png" alt="Play" width="18px" />`;
 
-        const songTitle = document.createElement('span');
-        songTitle.classList.add('songTitle');
-        songTitle.innerText = title;
+    const songTitle = document.createElement('span');
+    songTitle.classList.add('songTitle');
+    songTitle.innerText = title;
 
-        // Add event listener for the play button
-        playButton.onclick = () => {
-            if (audioPlayer.src.includes(songFile) && !audioPlayer.paused) {
-                audioPlayer.pause();
-                playButton.querySelector('img').src = 'play.png';
-            } else {
-                audioPlayer.src = songFile;
-                audioPlayer.play().catch(error => {
-                    console.error('Error playing the audio:', error);
-                });
-                playButton.querySelector('img').src = 'pause.png';
-                
-                if (currentlyPlaying && currentlyPlaying !== songFile) {
-                    const previousItem = document.querySelector(`.playButton[id="${currentlyPlaying}play"]`);
-                    previousItem.querySelector('img').src = 'play.png';
-                }
-
-                currentlyPlaying = title; // Update with song title, not song file
-            }
-        };
-
-        // Event listener for opening the player UI
-        songTitle.onclick = () => {
-            songNameDisplay.innerText = title;
-            songImage.src = songImageFile;
-            songDetail.style.display = 'block';
-        };
-
-        songItem.appendChild(playButton);
-        songItem.appendChild(songTitle);
-        songList.appendChild(songItem);
-    });
-
-    // Event listener to close the detail UI
-    closeDetail.onclick = () => {
-        songDetail.style.display = 'none';
-    };
-
-    // Control the play/pause button inside the player window UI
-    playPauseButton.onclick = () => {
-        if (!audioPlayer.paused) {
+    // Add event listener for the play button
+    playButton.onclick = () => {
+        if (audioPlayer.src.includes(songFile) && !audioPlayer.paused) {
             audioPlayer.pause();
-            playPauseIcon.src = 'play.png';
+            playButton.querySelector('img').src = 'play.png';
         } else {
-            audioPlayer.play();
-            playPauseIcon.src = 'pause.png';
+            audioPlayer.src = songFile;
+            audioPlayer.play().catch(error => {
+                console.error('Error playing the audio:', error);
+            });
+            playButton.querySelector('img').src = 'pause.png';
+            
+            if (currentlyPlaying && currentlyPlaying !== songFile) {
+                const previousItem = document.querySelector(`.playButton[id="${currentlyPlaying}play"]`);
+                previousItem.querySelector('img').src = 'play.png';
+            }
+
+            currentlyPlaying = title; // Update with song title, not song file
         }
     };
-    </script>
+
+    // Event listener for opening the player UI
+    songTitle.onclick = () => {
+        songNameDisplay.innerText = title;      // Set song name display
+        songImage.src = songImageFile;          // Set song image
+        playPauseIcon.src = 'play.png';         // Reset to the play icon
+        playPauseButton.setAttribute('aria-label', title); // Label the play/pause button with the song title
+        songDetail.style.display = 'block';      // Show the song detail window
+    };
+
+    songItem.appendChild(playButton);
+    songItem.appendChild(songTitle);
+    songList.appendChild(songItem);
+});
+
+// Event listener to close the detail UI
+closeDetail.onclick = () => {
+    songDetail.style.display = 'none';
+};
+
+// Control the play/pause button inside the player window UI
+playPauseButton.onclick = () => {
+    if (!audioPlayer.paused) {
+        audioPlayer.pause();
+        playPauseIcon.src = 'play.png';
+    } else {
+        audioPlayer.play();
+        playPauseIcon.src = 'pause.png';
+    }
+};
+ </script>
 </body>
 </html>
