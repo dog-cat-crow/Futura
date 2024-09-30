@@ -135,24 +135,34 @@
             songTitle.classList.add('songTitle');
             songTitle.innerText = title;
 
+            // Play/pause button click event
             playButton.onclick = () => {
+                console.log(`Attempting to play/pause: ${songFile}`); // Log the song being played
+
                 if (audioPlayer.src.includes(songFile) && !audioPlayer.paused) {
                     audioPlayer.pause();
                     playButton.querySelector('img').src = 'play.png';
                 } else {
                     audioPlayer.src = songFile;
-                    audioPlayer.play();
+                    audioPlayer.play().catch(error => {
+                        console.error('Error playing the audio:', error); // Catch and log any errors
+                    });
                     playButton.querySelector('img').src = 'pause.png';
+                    
+                    // Reset previous song button
                     if (currentlyPlaying && currentlyPlaying !== songFile) {
                         const previousItem = document.querySelector(`.songItem[data-song="${currentlyPlaying}"]`);
                         const previousPlayButton = previousItem.querySelector('.playButton img');
                         previousPlayButton.src = 'play.png';
                     }
+
                     currentlyPlaying = songFile;
                 }
             };
 
+            // Song title click event for showing song details
             songTitle.onclick = () => {
+                console.log(`Displaying details for: ${title}`); // Log the song details display
                 songNameDisplay.innerText = title;
                 songImage.src = songImageFile;
                 songDetail.style.display = 'block';
@@ -163,43 +173,27 @@
             songList.appendChild(songItem);
         });
 
+        // Close the song detail view
         closeDetail.onclick = () => {
             songDetail.style.display = 'none';
         };
 
+        // Play/pause button in the player window
         playPauseButton.onclick = () => {
             if (!audioPlayer.paused) {
                 audioPlayer.pause();
                 playPauseIcon.src = 'play.png';
             } else {
-                audioPlayer.play();
+                audioPlayer.play().catch(error => {
+                    console.error('Error playing the audio:', error); // Catch any play errors
+                });
                 playPauseIcon.src = 'pause.png';
             }
         };
 
-        // Script to check which title's button is clicked and trigger the respective song
-        songList.addEventListener('click', (e) => {
-            if (e.target.classList.contains('playButton')) {
-                const songItem = e.target.closest('.songItem');
-                const songFile = songItem.dataset.song;
-
-                if (audioPlayer.src.includes(songFile) && !audioPlayer.paused) {
-                    audioPlayer.pause();
-                    e.target.querySelector('img').src = 'play.png';
-                } else {
-                    audioPlayer.src = songFile;
-                    audioPlayer.play();
-                    e.target.querySelector('img').src = 'pause.png';
-                    
-                    if (currentlyPlaying && currentlyPlaying !== songFile) {
-                        const previousItem = document.querySelector(`.songItem[data-song="${currentlyPlaying}"]`);
-                        const previousPlayButton = previousItem.querySelector('.playButton img');
-                        previousPlayButton.src = 'play.png';
-                    }
-
-                    currentlyPlaying = songFile;
-                }
-            }
+        // Check for errors during song playback
+        audioPlayer.addEventListener('error', function(e) {
+            console.error('Audio playback error:', e);
         });
     </script>
 </body>
