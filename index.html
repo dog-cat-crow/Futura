@@ -77,7 +77,8 @@
 #playPauseButton {
     position: absolute; /* Use absolute positioning */
     top: 280px; /* Set to 280 pixels from the top */
-    left: calc(50% - 25px); /* Centering the button by adjusting for half its width */
+    left: 50%; /* Position to the center of the screen */
+    transform: translateX(-50%); /* Shift left by half its width to center it */
     width: 50px; /* Set width to 50 pixels */
     height: 50px; /* Set height to 50 pixels */
     background: transparent; /* Keep background transparent */
