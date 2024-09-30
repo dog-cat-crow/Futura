@@ -6,7 +6,7 @@
     <title>Mobile MP3 Player</title>
     <style>
         body {
-            background-color: #333; /* Dark gray background */
+            background-color: #333;
             color: white;
             font-family: Arial, sans-serif;
             margin: 0;
@@ -40,56 +40,65 @@
             padding: 10px;
             margin: 5px 0;
         }
-        .songItem button {
+        .playButton {
             background-color: transparent;
             border: none;
             color: white;
             font-size: 18px;
             cursor: pointer;
+            margin-right: 15px;
+        }
+        .songTitle {
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 20px;
+            flex-grow: 1;
+            text-align: center;
         }
         #songDetail {
             padding: 35px;
-            position: fixed; /* Centering the container */
-            top: 50%; /* Center vertically */
-            left: 50%; /* Center horizontally */
-            transform: translate(-50%, -50%); /* Adjusting to center */
-            background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent background */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
             border-radius: 10px;
-            width: 300px; /* Adjust width as needed */
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Optional shadow */
-            display: none; /* Initially hidden */
+            width: 300px;
+            display: none;
         }
         #closeDetail {
             position: absolute;
-            top: 10px; /* 10 pixels from the top */
-            right: 10px; /* 10 pixels from the right */
+            top: 10px;
+            right: 10px;
+            font-size: 25px;
+            cursor: pointer;
         }
         #songName {
-            margin-top: 40px; /* 40 pixels below the top of the container */
-            text-align: center; /* Centered */
-            font-size: 24px; /* Font size */
+            margin-top: 60px;
+            text-align: center;
+            font-size: 24px;
         }
         #songImage {
-            margin-top: 30px; /* 30 pixels below the song title */
-            width: 150px; /* Size */
-            height: 150px; /* Size */
-            display: block; /* Centered */
+            margin-top: 30px;
+            width: 120px;
+            height: 120px;
+            display: block;
             margin-left: auto;
             margin-right: auto;
         }
         #playPauseButton {
-            margin-top: 50px; /* 50 pixels below the song image */
-            width: 40px; /* Size */
-            height: 40px; /* Size */
-            display: block; /* Centered */
+            margin-top: 40px;
+            width: 40px;
+            height: 40px;
+            display: block;
             margin-left: auto;
             margin-right: auto;
-            background: transparent; /* Optional */
-            border: none; /* No border */
-            cursor: pointer; /* Pointer on hover */
+            background: transparent;
+            border: none;
+            cursor: pointer;
         }
         #audioPlayer {
-            width: 100%; /* Full width */
+            width: 100%;
             margin-top: 10px;
         }
     </style>
@@ -101,25 +110,26 @@
     </div>
     
     <div id="songList">
-        <div class="songItem" data-song="Alone.mp3" data-image="Alone.jpg">
-            <button class="playButton">▶</button>
-            Alone
-            <button class="downloadButton">⬇</button>
+        <div class="songItem" data-song="A.mp3" data-image="A.jpg">
+            <button class="playButton"><img src="play.png" alt="Play" width="18px" /></button>
+            <span class="songTitle">A</span>
         </div>
-        <div class="songItem" data-song="Animals.mp3" data-image="Animals.jpg">
-            <button class="playButton">▶</button>
-            Animals
-            <button class="downloadButton">⬇</button>
+        <div class="songItem" data-song="B.mp3" data-image="B.jpg">
+            <button class="playButton"><img src="play.png" alt="Play" width="18px" /></button>
+            <span class="songTitle">B</span>
         </div>
-        <div class="songItem" data-song="Fly_Away.mp3" data-image="Fly_Away.jpg">
-            <button class="playButton">▶</button>
-            Fly Away
-            <button class="downloadButton">⬇</button>
+        <div class="songItem" data-song="C.mp3" data-image="C.jpg">
+            <button class="playButton"><img src="play.png" alt="Play" width="18px" /></button>
+            <span class="songTitle">C</span>
+        </div>
+        <div class="songItem" data-song="D.mp3" data-image="D.jpg">
+            <button class="playButton"><img src="play.png" alt="Play" width="18px" /></button>
+            <span class="songTitle">D</span>
         </div>
     </div>
 
     <div id="songDetail">
-        <button id="closeDetail">×</button>
+        <span id="closeDetail">×</span>
         <h2 id="songName"></h2>
         <img id="songImage" alt="Album Art" />
         <button id="playPauseButton">
@@ -138,63 +148,41 @@
         const playPauseButton = document.getElementById('playPauseButton');
         const playPauseIcon = document.getElementById('playPauseIcon');
 
-        let currentlyPlaying = null; // To keep track of the currently playing song
+        let currentlyPlaying = null;
 
         songItems.forEach(item => {
             const playButton = item.querySelector('.playButton');
+            const songTitle = item.querySelector('.songTitle');
             const songFile = item.dataset.song;
             const imageFile = item.dataset.image;
 
             playButton.onclick = () => {
-                if (currentlyPlaying && currentlyPlaying !== songFile) {
-                    const previousItem = document.querySelector(`.songItem[data-song="${currentlyPlaying}"]`);
-                    const previousPlayButton = previousItem.querySelector('.playButton');
-                    previousPlayButton.innerText = '▶'; // Reset previous play button
-                }
-
                 if (audioPlayer.src.includes(songFile) && !audioPlayer.paused) {
                     audioPlayer.pause();
-                    playButton.innerText = '▶'; // Change to play icon
-                    playPauseIcon.src = 'play.png'; // Update icon
+                    playButton.querySelector('img').src = 'play.png';
                 } else {
                     audioPlayer.src = songFile;
                     audioPlayer.play();
-                    playButton.innerText = '⏸'; // Change to pause icon
-                    playPauseIcon.src = 'pause.png'; // Update icon
+                    playButton.querySelector('img').src = 'pause.png';
+                    if (currentlyPlaying && currentlyPlaying !== songFile) {
+                        const previousItem = document.querySelector(`.songItem[data-song="${currentlyPlaying}"]`);
+                        const previousPlayButton = previousItem.querySelector('.playButton img');
+                        previousPlayButton.src = 'play.png';
+                    }
+                    currentlyPlaying = songFile;
                 }
+            };
 
-                // Display song details
-                songNameDisplay.innerText = item.textContent.trim();
+            songTitle.onclick = () => {
+                songNameDisplay.innerText = songTitle.innerText;
                 songImage.src = imageFile;
                 songDetail.style.display = 'block';
-
-                currentlyPlaying = songFile; // Update currently playing
             };
         });
 
         closeDetail.onclick = () => {
-            audioPlayer.pause();
-            audioPlayer.src = ''; // Reset audio source
             songDetail.style.display = 'none';
-            currentlyPlaying = null; // Reset currently playing
-            songItems.forEach(item => {
-                item.querySelector('.playButton').innerText = '▶'; // Reset play buttons
-            });
-            playPauseIcon.src = 'play.png'; // Reset play icon
         };
-
-        // Download button functionality
-        document.querySelectorAll('.downloadButton').forEach(button => {
-            button.onclick = (e) => {
-                const songFile = e.target.parentNode.dataset.song;
-                const link = document.createElement('a');
-                link.href = songFile;
-                link.download = songFile;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            };
-        });
     </script>
 </body>
 </html>
