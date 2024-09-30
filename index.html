@@ -155,22 +155,23 @@ songTitles.forEach((title) => {
 
     // Add event listener for the play button
     playButton.onclick = () => {
+        // Syncing the window player state with the menu button
         if (audioPlayer.src.includes(songFile) && !audioPlayer.paused) {
             audioPlayer.pause();
             playButton.querySelector('img').src = 'play.png';
         } else {
-            audioPlayer.src = songFile;
+            if (currentlyPlaying !== title) {
+                const previousItem = document.querySelector(`.playButton[id="${currentlyPlaying}play"]`);
+                if (previousItem) {
+                    previousItem.querySelector('img').src = 'play.png'; // Reset previous play button
+                }
+                audioPlayer.src = songFile; // Load the new song
+                currentlyPlaying = title; // Update currently playing song
+            }
             audioPlayer.play().catch(error => {
                 console.error('Error playing the audio:', error);
             });
             playButton.querySelector('img').src = 'pause.png';
-            
-            if (currentlyPlaying && currentlyPlaying !== songFile) {
-                const previousItem = document.querySelector(`.playButton[id="${currentlyPlaying}play"]`);
-                previousItem.querySelector('img').src = 'play.png';
-            }
-
-            currentlyPlaying = title; // Update with song title, not song file
         }
     };
 
@@ -182,11 +183,8 @@ songTitles.forEach((title) => {
         playPauseButton.setAttribute('aria-label', title); // Independently set label with song title
         songDetail.style.display = 'block';      // Show the song detail window
 
-        // Load and play the selected song when the song title is clicked
+        // Load the selected song into the audioPlayer without autoplay
         audioPlayer.src = songFile;
-        audioPlayer.play().catch(error => {
-            console.error('Error playing the audio:', error);
-        });
     };
 
     songItem.appendChild(playButton);
@@ -201,16 +199,28 @@ closeDetail.onclick = () => {
 
 // Control the play/pause button inside the player window UI
 playPauseButton.onclick = () => {
-    if (!audioPlayer.paused) {
+    if (audioPlayer.paused) {
+        audioPlayer.play().catch(error => {
+            console.error('Error playing the audio:', error);
+        });
+        playPauseIcon.src = 'pause.png';
+        
+        // Sync window button with the current song
+        const currentMenuButton = document.querySelector(`.playButton[id="${currentlyPlaying}play"]`);
+        if (currentMenuButton) {
+            currentMenuButton.querySelector('img').src = 'pause.png';
+        }
+    } else {
         audioPlayer.pause();
         playPauseIcon.src = 'play.png';
-    } else {
-        audioPlayer.play();
-        playPauseIcon.src = 'pause.png';
+        
+        // Sync window button with the current song
+        const currentMenuButton = document.querySelector(`.playButton[id="${currentlyPlaying}play"]`);
+        if (currentMenuButton) {
+            currentMenuButton.querySelector('img').src = 'play.png';
+        }
     }
 };
 </script>
-
-
 </body>
 </html>
