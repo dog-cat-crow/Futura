@@ -73,28 +73,39 @@
         margin-left: auto;
         margin-right: auto;
     }
+/* Existing styles */
 #playPauseButton {
-    position: absolute; /* Use absolute positioning */
-    top: 280px; /* Set to 300 pixels from the top */
+    position: absolute;
+    top: 280px;
     left: 50%; /* Center horizontally */
-    width: 50px; /* Set width to 50 pixels */
-    height: 50px; /* Set height to 50 pixels */
-    background: transparent; /* Keep background transparent */
-    border: none; /* Remove border */
-    cursor: pointer; /* Change cursor on hover */
+    width: 70px; /* Increased width */
+    height: 70px; /* Increased height */
+    background: transparent;
+    border: none;
+    cursor: pointer;
 }
-    #resetButton, #muteButton {
+
+#playPauseIcon {
+    max-width: 50px; /* Increased maximum width */
+    max-height: 50px; /* Increased maximum height */
+}
+/* Reset and Mute Button Styles */
+#resetButton {
+    position: absolute; /* Use absolute positioning */
+    top: 280px; /* Align with the play/pause button vertically */
+    left: 60px; /* 60px from the left edge */
     border: none; /* Remove border */
     background: transparent; /* Keep background transparent */
     cursor: pointer; /* Change cursor to pointer on hover */
-    /* You can add more styles here as needed */
-    }
-    #resetButton {
-        left: 60px; /* 60px from the left edge */
-    }
-    #muteButton {
-        right: 60px; /* 60px from the right edge */
-    }
+}
+#muteButton {
+    position: absolute; /* Use absolute positioning */
+    top: 280px; /* Align with the play/pause button vertically */
+    right: 60px; /* 60px from the right edge */
+    border: none; /* Remove border */
+    background: transparent; /* Keep background transparent */
+    cursor: pointer; /* Change cursor to pointer on hover */
+}
     #playPauseIcon {
         max-width: 50px; /* Set maximum width for the icon */
         max-height: 50px; /* Set maximum height for the icon */
