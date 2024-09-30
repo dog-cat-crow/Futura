@@ -116,13 +116,21 @@
     <div id="songList"></div>
 
     <div id="songDetail">
-        <span id="closeDetail">×</span>
-        <h2 id="songName"></h2>
-        <img id="songImage" alt="Album Art" />
+    <span id="closeDetail">×</span>
+    <h2 id="songName"></h2>
+    <img id="songImage" alt="Album Art" />
+    <div id="buttonContainer">
+        <button id="resetButton">
+            <img src="reset.png" alt="Reset" width="30px" />
+        </button>
         <button id="playPauseButton">
             <img id="playPauseIcon" src="play.png" alt="Play/Pause" />
         </button>
-        <audio id="audioPlayer" controls></audio>
+        <button id="muteButton">
+            <img src="mute.png" alt="Mute" width="30px" />
+        </button>
+    </div>
+    <audio id="audioPlayer" controls></audio>
     </div>
     
     <script>
