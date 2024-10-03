@@ -1,11 +1,10 @@
 const CACHE_NAME = 'dynamic-music-cache-v1';
 
 self.addEventListener('install', event => {
-    // The install event can be used to cache static assets if needed
-    event.waitUntil(self.skipWaiting());
+    // No need to cache anything during install if we only want dynamic caching
+    self.skipWaiting();
 });
 
-// Fetch event to cache MP3 and image files dynamically
 self.addEventListener('fetch', event => {
     const request = event.request;
 
@@ -13,27 +12,29 @@ self.addEventListener('fetch', event => {
     if (request.url.endsWith('.mp3') || request.url.endsWith('.jpg')) {
         event.respondWith(
             caches.match(request).then(cachedResponse => {
-                // If the file is in cache, return it
+                // If there's a cached response, return it
                 if (cachedResponse) {
                     return cachedResponse;
                 }
 
-                // Otherwise, fetch it and add it to the cache
+                // Fetch from network and cache it
                 return fetch(request).then(networkResponse => {
                     return caches.open(CACHE_NAME).then(cache => {
-                        cache.put(request, networkResponse.clone());
+                        // Only cache the response if it's valid
+                        if (networkResponse && networkResponse.status === 200) {
+                            cache.put(request, networkResponse.clone());
+                        }
                         return networkResponse;
                     });
                 });
             })
         );
     } else {
-        // For other requests (HTML, CSS, etc.), fallback to normal network fetching
+        // Default fetch response for other requests
         event.respondWith(fetch(request).catch(() => caches.match(request)));
     }
 });
 
-// Clean up old caches when a new version is activated
 self.addEventListener('activate', event => {
     const cacheWhitelist = [CACHE_NAME];
     event.waitUntil(
