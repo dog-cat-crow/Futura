@@ -260,6 +260,10 @@
     var audioElement = document.querySelector('audio'); // Get the audio element
     var currentTimeInterval;
 
+    // Replace with actual selectors for your website to get the song title and icon
+    var songTitleElement = document.querySelector('.song-title'); // Add correct selector for the song title
+    var songIconElement = document.querySelector('.song-icon');   // Add correct selector for the song icon (image)
+
     // Function to update the current time of the audio
     function updateCurrentTime() {
         if (audioElement) {
@@ -269,11 +273,13 @@
         }
     }
 
-    // Play the song
+    // Play the song and send metadata to Android
     function playSong() {
         if (audioElement) {
             audioElement.play();
-            Android.onPlay(); // Notify Android that the song is playing
+            var songTitle = songTitleElement ? songTitleElement.textContent : "Unknown Title";
+            var songIcon = songIconElement ? songIconElement.src : ""; // Get the icon URL
+            Android.onPlay(songTitle, songIcon); // Send song title and icon to Android
             currentTimeInterval = setInterval(updateCurrentTime, 1000); // Update play time every second
         }
     }
@@ -291,13 +297,15 @@
     if (audioElement) {
         // When the audio starts playing
         audioElement.addEventListener('play', function() {
-            Android.onPlay(); // Call Android function when play is triggered
+            var songTitle = songTitleElement ? songTitleElement.textContent : "Unknown Title";
+            var songIcon = songIconElement ? songIconElement.src : ""; // Get the icon URL
+            Android.onPlay(songTitle, songIcon); // Send song title and icon to Android
             currentTimeInterval = setInterval(updateCurrentTime, 1000); // Start updating time
         });
 
         // When the audio is paused
         audioElement.addEventListener('pause', function() {
-            Android.onPause(); // Call Android function when pause is triggered
+            Android.onPause(); // Notify Android that the song is paused
             clearInterval(currentTimeInterval); // Stop updating time
         });
     }
@@ -312,6 +320,7 @@
     }
 
 </script>
+
 
 </body>
 </html>
