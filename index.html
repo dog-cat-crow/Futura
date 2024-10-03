@@ -256,69 +256,22 @@
             }
         };
     </script>
-    <script>
-    var audioElement = document.querySelector('audio'); // Get the audio element
-    var currentTimeInterval;
+    <script type="text/javascript">
+    var audio = document.querySelector('audio'); // Select your audio element
 
-    // Replace with actual selectors for your website to get the song title and icon
-    var songTitleElement = document.querySelector('.song-title'); // Add correct selector for the song title
-    var songIconElement = document.querySelector('.song-icon');   // Add correct selector for the song icon (image)
-
-    // Function to update the current time of the audio
-    function updateCurrentTime() {
-        if (audioElement) {
-            var currentTime = audioElement.currentTime;
-            // Send the current play time to Android app (in seconds)
-            Android.updateTime(currentTime.toFixed(2)); 
+    // Notify Android app when audio is played
+    audio.addEventListener('play', function() {
+        if (typeof Android !== 'undefined' && Android.onPlay) {
+            Android.onPlay(); // Call the Android app's onPlay() method
         }
-    }
+    });
 
-    // Play the song and send metadata to Android
-    function playSong() {
-        if (audioElement) {
-            audioElement.play();
-            var songTitle = songTitleElement ? songTitleElement.textContent : "Unknown Title";
-            var songIcon = songIconElement ? songIconElement.src : ""; // Get the icon URL
-            Android.onPlay(songTitle, songIcon); // Send song title and icon to Android
-            currentTimeInterval = setInterval(updateCurrentTime, 1000); // Update play time every second
+    // Notify Android app when audio is paused
+    audio.addEventListener('pause', function() {
+        if (typeof Android !== 'undefined' && Android.onPause) {
+            Android.onPause(); // Call the Android app's onPause() method
         }
-    }
-
-    // Pause the song
-    function pauseSong() {
-        if (audioElement) {
-            audioElement.pause();
-            Android.onPause(); // Notify Android that the song is paused
-            clearInterval(currentTimeInterval); // Stop updating play time when paused
-        }
-    }
-
-    // Add event listeners for play and pause actions
-    if (audioElement) {
-        // When the audio starts playing
-        audioElement.addEventListener('play', function() {
-            var songTitle = songTitleElement ? songTitleElement.textContent : "Unknown Title";
-            var songIcon = songIconElement ? songIconElement.src : ""; // Get the icon URL
-            Android.onPlay(songTitle, songIcon); // Send song title and icon to Android
-            currentTimeInterval = setInterval(updateCurrentTime, 1000); // Start updating time
-        });
-
-        // When the audio is paused
-        audioElement.addEventListener('pause', function() {
-            Android.onPause(); // Notify Android that the song is paused
-            clearInterval(currentTimeInterval); // Stop updating time
-        });
-    }
-
-    // Listen for commands from Android to play or pause
-    function playPauseFromAndroid() {
-        if (audioElement.paused) {
-            playSong(); // Play if paused
-        } else {
-            pauseSong(); // Pause if playing
-        }
-    }
-
+    });
 </script>
 
 
