@@ -256,5 +256,62 @@
             }
         };
     </script>
+    <script>
+    var audioElement = document.querySelector('audio'); // Get the audio element
+    var currentTimeInterval;
+
+    // Function to update the current time of the audio
+    function updateCurrentTime() {
+        if (audioElement) {
+            var currentTime = audioElement.currentTime;
+            // Send the current play time to Android app (in seconds)
+            Android.updateTime(currentTime.toFixed(2)); 
+        }
+    }
+
+    // Play the song
+    function playSong() {
+        if (audioElement) {
+            audioElement.play();
+            Android.onPlay(); // Notify Android that the song is playing
+            currentTimeInterval = setInterval(updateCurrentTime, 1000); // Update play time every second
+        }
+    }
+
+    // Pause the song
+    function pauseSong() {
+        if (audioElement) {
+            audioElement.pause();
+            Android.onPause(); // Notify Android that the song is paused
+            clearInterval(currentTimeInterval); // Stop updating play time when paused
+        }
+    }
+
+    // Add event listeners for play and pause actions
+    if (audioElement) {
+        // When the audio starts playing
+        audioElement.addEventListener('play', function() {
+            Android.onPlay(); // Call Android function when play is triggered
+            currentTimeInterval = setInterval(updateCurrentTime, 1000); // Start updating time
+        });
+
+        // When the audio is paused
+        audioElement.addEventListener('pause', function() {
+            Android.onPause(); // Call Android function when pause is triggered
+            clearInterval(currentTimeInterval); // Stop updating time
+        });
+    }
+
+    // Listen for commands from Android to play or pause
+    function playPauseFromAndroid() {
+        if (audioElement.paused) {
+            playSong(); // Play if paused
+        } else {
+            pauseSong(); // Pause if playing
+        }
+    }
+
+</script>
+
 </body>
 </html>
