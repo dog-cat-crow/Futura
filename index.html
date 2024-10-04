@@ -170,7 +170,7 @@
 let songData = [];
 let currentlyPlayingSong = null;
 let activePlayer = null;
-let isPlaying = false;
+let audioPlayer = null;
 
 fetch('songs.json')
     .then(response => response.json())
@@ -206,15 +206,19 @@ function displaySongs(songs) {
         songItem.onclick = () => {
             if (activePlayer) {
                 activePlayer.style.display = 'none';
+                audioPlayer.pause();
             }
 
             currentlyPlayingSong = title;
             document.getElementById('songName').innerText = title;
             document.getElementById('songImage').src = image;
-            document.getElementById('audioPlayer').src = file;
+            audioPlayer = document.getElementById('audioPlayer');
+            audioPlayer.src = file;
+            audioPlayer.play();
 
             document.getElementById('songDetail').style.display = 'block';
             activePlayer = document.getElementById('songDetail');
+            updatePlayPauseIcon(true);
         };
 
         songList.appendChild(songItem);
@@ -223,57 +227,34 @@ function displaySongs(songs) {
 
 document.getElementById('closeDetail').onclick = () => {
     document.getElementById('songDetail').style.display = 'none';
+    if (audioPlayer) {
+        audioPlayer.pause();
+        updatePlayPauseIcon(false);
+    }
 };
 
 const playPauseButton = document.getElementById('playPauseButton');
 const playPauseIcon = document.getElementById('playPauseIcon');
-const audioPlayer = document.getElementById('audioPlayer');
 
 playPauseButton.onclick = () => {
-    if (audioPlayer.src && audioPlayer.src.endsWith(`${currentlyPlayingSong}.mp3`)) {
+    if (audioPlayer && audioPlayer.src.endsWith(`${currentlyPlayingSong}.mp3`)) {
         if (audioPlayer.paused) {
             audioPlayer.play();
-            isPlaying = true;
+            updatePlayPauseIcon(true);
         } else {
             audioPlayer.pause();
-            isPlaying = false;
+            updatePlayPauseIcon(false);
         }
-        updatePlayPauseIcon();
     }
 };
 
-const resetButton = document.getElementById('resetButton');
-resetButton.onclick = () => {
-    audioPlayer.currentTime = 0;
-    if (currentlyPlayingSong) {
-        audioPlayer.play();
-        isPlaying = true;
-        updatePlayPauseIcon();
-    }
-};
-
-const muteButton = document.getElementById('muteButton');
-let isMuted = false;
-
-muteButton.onclick = () => {
-    if (!isMuted) {
-        audioPlayer.volume = 0;
-        muteButton.innerHTML = `<img src="unmute.png" alt="Unmute" width="30px" />`;
-        isMuted = true;
-    } else {
-        audioPlayer.volume = 1;
-        muteButton.innerHTML = `<img src="mute.png" alt="Mute" width="30px" />`;
-        isMuted = false;
-    }
-};
-
-function updatePlayPauseIcon() {
+function updatePlayPauseIcon(isPlaying) {
     playPauseIcon.src = isPlaying ? 'pause.png' : 'play.png';
 }
 
 audioPlayer.onended = () => {
-    isPlaying = false;
-    updatePlayPauseIcon();
+    updatePlayPauseIcon(false);
+    currentlyPlayingSong = null;
 };
 </script>
 <script>
