@@ -227,10 +227,6 @@
     localStorage.setItem('currentSong', title); // Save the current song
     localStorage.setItem('isPlaying', 'false'); // Song is not playing yet
 };
-                document.getElementById('songName').innerText = title;
-                document.getElementById('songImage').src = image;
-                document.getElementById('songDetail').style.display = 'block';
-            };
 
             songList.appendChild(songItem);
         });
