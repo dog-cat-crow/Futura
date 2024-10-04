@@ -169,6 +169,7 @@
     <script>
 let songData = [];
 let currentlyPlayingSong = null;
+let activePlayer = null;
 let isPlaying = false;
 
 fetch('songs.json')
@@ -203,12 +204,17 @@ function displaySongs(songs) {
         songItem.innerText = title;
 
         songItem.onclick = () => {
+            if (activePlayer) {
+                activePlayer.style.display = 'none';
+            }
+
             currentlyPlayingSong = title;
             document.getElementById('songName').innerText = title;
             document.getElementById('songImage').src = image;
             document.getElementById('audioPlayer').src = file;
 
             document.getElementById('songDetail').style.display = 'block';
+            activePlayer = document.getElementById('songDetail');
         };
 
         songList.appendChild(songItem);
@@ -239,6 +245,11 @@ playPauseButton.onclick = () => {
 const resetButton = document.getElementById('resetButton');
 resetButton.onclick = () => {
     audioPlayer.currentTime = 0;
+    if (currentlyPlayingSong) {
+        audioPlayer.play();
+        isPlaying = true;
+        updatePlayPauseIcon();
+    }
 };
 
 const muteButton = document.getElementById('muteButton');
@@ -247,9 +258,11 @@ let isMuted = false;
 muteButton.onclick = () => {
     if (!isMuted) {
         audioPlayer.volume = 0;
+        muteButton.innerHTML = `<img src="unmute.png" alt="Unmute" width="30px" />`;
         isMuted = true;
     } else {
         audioPlayer.volume = 1;
+        muteButton.innerHTML = `<img src="mute.png" alt="Mute" width="30px" />`;
         isMuted = false;
     }
 };
@@ -263,20 +276,6 @@ audioPlayer.onended = () => {
     updatePlayPauseIcon();
 };
 </script>
-    <script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('service-worker.js')
-                .then(registration => {
-                    console.log('Service Worker registered with scope:', registration.scope);
-                })
-                .catch(error => {
-                    console.error('Service Worker registration failed:', error);
-                });
-        });
-    }
-</script>
-
 <script>
     if (navigator.serviceWorker) {
         navigator.serviceWorker.ready.then((registration) => {
