@@ -221,12 +221,6 @@
     document.getElementById('audioPlayer').src = file;
     document.getElementById('songDetail').style.display = 'block';
 
-    // Remove the auto-play functionality
-    isPlaying = false;
-    updatePlayPauseButton('play'); // Ensure the play button is shown
-    localStorage.setItem('currentSong', title); // Save the current song
-    localStorage.setItem('isPlaying', 'false'); // Song is not playing yet
-};
 
             songList.appendChild(songItem);
         });
@@ -311,24 +305,6 @@
         }
     });
     </script>
-
-    <script type="text/javascript">
-    var audio = document.querySelector('audio'); // Select your audio element
-
-    // Notify Android app when audio is played
-    audio.addEventListener('play', function() {
-        if (typeof Android !== 'undefined' && Android.onPlay) {
-            Android.onPlay(); // Call the Android app's onPlay() method
-        }
-    });
-
-    // Notify Android app when audio is paused
-    audio.addEventListener('pause', function() {
-        if (typeof Android !== 'undefined' && Android.onPause) {
-            Android.onPause(); // Call the Android app's onPause() method
-        }
-    });
-</script>
 
     <script>
     if ('serviceWorker' in navigator) {
