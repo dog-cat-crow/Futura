@@ -167,109 +167,129 @@
         <audio id="audioPlayer" controls></audio>
     </div>
     <script>
-    let songData = [];
-    let currentlyPlayingSong = null;
-    let isPlaying = false;
+let songData = [];
+let currentlyPlayingSong = null;
+let isPlaying = false;
 
-    fetch('songs.json')
-        .then(response => response.json())
-        .then(data => {
-            songData = data.songs;
-            displaySongs(songData);
-        })
-        .catch(error => {
-            console.error('Error fetching songs:', error);
-        });
-
-    const searchBar = document.getElementById('searchBar');
-    searchBar.addEventListener('input', () => {
-        const query = searchBar.value.toLowerCase();
-        const filteredSongs = songData.filter(song => song.toLowerCase().includes(query));
-        displaySongs(filteredSongs);
+fetch('songs.json')
+    .then(response => response.json())
+    .then(data => {
+        songData = data.songs;
+        displaySongs(songData);
+    })
+    .catch(error => {
+        console.error('Error fetching songs:', error);
     });
 
-    function displaySongs(songs) {
-        const songList = document.getElementById('songList');
-        songList.innerHTML = '';
+const searchBar = document.getElementById('searchBar');
+searchBar.addEventListener('input', () => {
+    const query = searchBar.value.toLowerCase();
+    const filteredSongs = songData.filter(song => song.toLowerCase().includes(query));
+    displaySongs(filteredSongs);
+});
 
-        songs.forEach(title => {
-            const songItem = document.createElement('div');
-            songItem.classList.add('songItem');
+function displaySongs(songs) {
+    const songList = document.getElementById('songList');
+    songList.innerHTML = '';
 
-            const file = `${title}.mp3`;
-            const image = `${title}.jpg`;
+    songs.forEach(title => {
+        const songItem = document.createElement('div');
+        songItem.classList.add('songItem');
+        const file = `${title}.mp3`;
+        const image = `${title}.jpg`;
 
-            songItem.dataset.song = file;
-            songItem.dataset.image = image;
-            songItem.innerText = title;
+        songItem.dataset.song = file;
+        songItem.dataset.image = image;
+        songItem.innerText = title;
 
-            songItem.onclick = () => {
+        songItem.onclick = () => {
+            if (currentlyPlayingSong !== title) {
+                if (currentlyPlayingSong) {
+                    pauseCurrentSong();
+                }
                 currentlyPlayingSong = title;
                 document.getElementById('songName').innerText = title;
                 document.getElementById('songImage').src = image;
                 document.getElementById('audioPlayer').src = file;
-
                 document.getElementById('songDetail').style.display = 'block';
-            };
-
-            songList.appendChild(songItem);
-        });
-    }
-
-    document.getElementById('closeDetail').onclick = () => {
-        document.getElementById('songDetail').style.display = 'none';
-    };
-
-    const playPauseButton = document.getElementById('playPauseButton');
-    const playPauseIcon = document.getElementById('playPauseIcon');
-    const audioPlayer = document.getElementById('audioPlayer');
-
-    playPauseButton.onclick = () => {
-        if (audioPlayer.src && audioPlayer.src.endsWith(`${currentlyPlayingSong}.mp3`)) {
-            if (audioPlayer.paused) {
-                audioPlayer.play();
-                isPlaying = true;
+                playSong();
             } else {
-                audioPlayer.pause();
-                isPlaying = false;
+                togglePlayPause();
             }
-            updatePlayPauseIcon();
-        }
-    };
+        };
 
-    const resetButton = document.getElementById('resetButton');
-    resetButton.onclick = () => {
-        audioPlayer.currentTime = 0;
-        if (currentlyPlayingSong) {
-            audioPlayer.play();
-            isPlaying = true;
-            updatePlayPauseIcon();
-        }
-    };
+        songList.appendChild(songItem);
+    });
+}
 
-    const muteButton = document.getElementById('muteButton');
-    let isMuted = false;
+document.getElementById('closeDetail').onclick = () => {
+    document.getElementById('songDetail').style.display = 'none';
+};
 
-    muteButton.onclick = () => {
-        if (!isMuted) {
-            audioPlayer.volume = 0;
-            muteButton.innerHTML = `<img src="unmute.png" alt="Unmute" width="30px" />`;
-            isMuted = true;
-        } else {
-            audioPlayer.volume = 1;
-            muteButton.innerHTML = `<img src="mute.png" alt="Mute" width="30px" />`;
-            isMuted = false;
-        }
-    };
+const playPauseButton = document.getElementById('playPauseButton');
+const playPauseIcon = document.getElementById('playPauseIcon');
+const audioPlayer = document.getElementById('audioPlayer');
 
-    function updatePlayPauseIcon() {
-        playPauseIcon.src = isPlaying ? 'pause.png' : 'play.png';
+playPauseButton.onclick = () => {
+    togglePlayPause();
+};
+
+const resetButton = document.getElementById('resetButton');
+resetButton.onclick = () => {
+    audioPlayer.currentTime = 0;
+    if (currentlyPlayingSong) {
+        playSong();
     }
+};
 
-    audioPlayer.onended = () => {
-        isPlaying = false;
-        updatePlayPauseIcon();
-    };
+const muteButton = document.getElementById('muteButton');
+let isMuted = false;
+
+muteButton.onclick = () => {
+    if (!isMuted) {
+        audioPlayer.volume = 0;
+        muteButton.innerHTML = `<img src="unmute.png" alt="Unmute" width="30px" />`;
+        isMuted = true;
+    } else {
+        audioPlayer.volume = 1;
+        muteButton.innerHTML = `<img src="mute.png" alt="Mute" width="30px" />`;
+        isMuted = false;
+    }
+};
+
+function togglePlayPause() {
+    if (audioPlayer.src && audioPlayer.src.endsWith(`${currentlyPlayingSong}.mp3`)) {
+        if (audioPlayer.paused) {
+            playSong();
+        } else {
+            audioPlayer.pause();
+            isPlaying = false;
+            updatePlayPauseIcon();
+        }
+    }
+}
+
+function playSong() {
+    audioPlayer.play();
+    isPlaying = true;
+    updatePlayPauseIcon();
+}
+
+function pauseCurrentSong() {
+    audioPlayer.pause();
+    isPlaying = false;
+    updatePlayPauseIcon();
+}
+
+function updatePlayPauseIcon() {
+    playPauseIcon.src = isPlaying ? 'pause.png' : 'play.png';
+}
+
+audioPlayer.onended = () => {
+    isPlaying = false;
+    updatePlayPauseIcon();
+};
+
 </script>
     <script>
     if ('serviceWorker' in navigator) {
