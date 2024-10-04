@@ -325,5 +325,88 @@ function updatePlayPauseIcon(icon, isPlaying) {
         icon.src = isPlaying ? 'pause.png' : 'play.png';
     }
 </script>
+    <script>
+// Define cache version and name
+const CACHE_NAME = 'musicdog-cache-v1';
+
+// Function to detect if the app is being run in the WebView by checking user agent
+function isInApp() {
+  return navigator.userAgent.includes('MusicDogApp');
+}
+
+// List of file types we want to cache
+const ASSET_FILE_TYPES = ['.mp3'];
+
+// Register the service worker only if we're in the app
+if (isInApp() && 'serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js')
+    .then((registration) => {
+      console.log('ServiceWorker registered: ', registration);
+    })
+    .catch((error) => {
+      console.log('ServiceWorker registration failed: ', error);
+    });
+}
+
+// Service worker event listeners
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll([
+        // Add essential assets here
+        '/',
+        '/index.html',
+        '/styles.css',
+        '/script.js'
+      ]);
+    })
+  );
+});
+
+self.addEventListener('fetch', (event) => {
+  const requestUrl = new URL(event.request.url);
+
+  // Check if the request is for an MP3 file and if we're in the app
+  if (ASSET_FILE_TYPES.some(type => requestUrl.pathname.endsWith(type)) && isInApp()) {
+    event.respondWith(
+      caches.open(CACHE_NAME).then((cache) => {
+        return cache.match(event.request).then((cachedResponse) => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          return fetch(event.request).then((networkResponse) => {
+            if (networkResponse.status === 200) {
+              cache.put(event.request, networkResponse.clone());
+            }
+            return networkResponse;
+          });
+        });
+      })
+    );
+  } else {
+    // Default behavior for non-MP3 resources
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        return cachedResponse || fetch(event.request);
+      })
+    );
+  }
+});
+
+self.addEventListener('activate', (event) => {
+  const currentCaches = [CACHE_NAME];
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (!currentCaches.includes(cacheName)) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
+</script>
 </body>
 </html>
