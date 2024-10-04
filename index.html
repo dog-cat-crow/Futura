@@ -272,6 +272,45 @@ function updatePlayPauseIcon(icon, isPlaying) {
 <script>
     let currentlyPlayingSong = null;
 
+    fetch('songs.json')
+        .then(response => response.json())
+        .then(data => {
+            songData = data.songs;
+            displaySongs(songData);
+        })
+        .catch(error => {
+            console.error('Error fetching songs:', error);
+        });
+
+    const searchBar = document.getElementById('searchBar');
+    searchBar.addEventListener('input', () => {
+        const query = searchBar.value.toLowerCase();
+        const filteredSongs = songData.filter(song => song.toLowerCase().includes(query));
+        displaySongs(filteredSongs);
+    });
+
+    function displaySongs(songs) {
+        const songList = document.getElementById('songList');
+        songList.innerHTML = '';
+
+        songs.forEach(title => {
+            const songItem = document.createElement('div');
+            songItem.classList.add('songItem');
+            const file = `${title}.mp3`;
+            const image = `${title}.jpg`;
+
+            songItem.dataset.song = file;
+            songItem.dataset.image = image;
+            songItem.innerText = title;
+
+            songItem.onclick = () => {
+                openSongDetail(title, file, image);
+            };
+
+            songList.appendChild(songItem);
+        });
+    }
+
     function openSongDetail(title, file, image) {
         document.getElementById('songName').innerText = title;
         document.getElementById('songImage').src = image;
@@ -279,17 +318,10 @@ function updatePlayPauseIcon(icon, isPlaying) {
         let audioPlayer;
         if (!activePlayers[title]) {
             audioPlayer = new Audio(file);
-            audioPlayer.id = `audioPlayer_${title}`;
-            audioPlayer.style.display = 'none';
             activePlayers[title] = { player: audioPlayer, isPlaying: false };
         } else {
             audioPlayer = activePlayers[title].player;
         }
-
-        // Close the detail view without stopping the song
-        document.getElementById('closeDetail').onclick = () => {
-            document.getElementById('songDetail').style.display = 'none';
-        };
 
         // Show the song detail window
         document.getElementById('songDetail').style.display = 'block';
@@ -302,7 +334,7 @@ function updatePlayPauseIcon(icon, isPlaying) {
             if (currentlyPlayingSong && currentlyPlayingSong !== title) {
                 activePlayers[currentlyPlayingSong].player.pause();
                 activePlayers[currentlyPlayingSong].isPlaying = false;
-                updatePlayPauseIcon(document.getElementById(`playPauseIcon_${currentlyPlayingSong}`), false);
+                updatePlayPauseIcon(currentlyPlayingSong, false);
             }
 
             if (activePlayers[title].isPlaying) {
@@ -314,22 +346,35 @@ function updatePlayPauseIcon(icon, isPlaying) {
                 activePlayers[title].isPlaying = true;
                 currentlyPlayingSong = title; // Set the currently playing song
             }
-            updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
+            updatePlayPauseIcon(title, activePlayers[title].isPlaying);
         };
-        
-        // Update play/pause icon for currently playing song in the list
-        const allSongItems = document.querySelectorAll('.songItem');
-        allSongItems.forEach(item => {
-            const itemTitle = item.innerText;
-            const itemIcon = document.createElement('img');
-            itemIcon.id = `playPauseIcon_${itemTitle}`;
-            itemIcon.src = activePlayers[itemTitle] && activePlayers[itemTitle].isPlaying ? 'pause.png' : 'play.png';
-            item.appendChild(itemIcon);
+
+        // Update the play/pause icon based on the currently playing song
+        updatePlayPauseIcon(title, activePlayers[title].isPlaying);
+    }
+
+    function updatePlayPauseIcon(title, isPlaying) {
+        const playPauseIcon = document.getElementById('playPauseIcon');
+        playPauseIcon.src = isPlaying ? 'pause.png' : 'play.png';
+    }
+
+    // Service Worker Registration
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(registration => {
+                    console.log('Service Worker registered with scope:', registration.scope);
+                })
+                .catch(error => {
+                    console.error('Service Worker registration failed:', error);
+                });
         });
     }
 
-    function updatePlayPauseIcon(icon, isPlaying) {
-        icon.src = isPlaying ? 'pause.png' : 'play.png';
+    if (navigator.serviceWorker) {
+        navigator.serviceWorker.ready.then((registration) => {
+            registration.active.postMessage({ type: 'CACHE_SONGS' });
+        });
     }
 </script>
 </body>
