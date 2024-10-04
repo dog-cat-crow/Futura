@@ -114,10 +114,10 @@
             left: 0;
             right: 0;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             padding: 0 60px;
         }
-        #playPauseButton, #resetButton, #muteButton {
+        #playPauseButton {
             background: transparent;
             border: none;
             cursor: pointer;
@@ -133,43 +133,36 @@
             display: none;
         }
         #searchBar {
-    color: white;
-}
+            color: white;
+        }
     </style>
 </head>
 <body>
     <div id="header">
-        <h1>FUTURA</h1>
-        <h2>LISTEN AD-FREE</h2>
-    </div>
+    <h1>FUTURA</h1>
+    <h2>LISTEN AD-FREE</h2>
+</div>
 
-    <div id="searchContainer">
-        <input type="text" id="searchBar" placeholder="Search Songs..." />
-    </div>
+<div id="searchContainer">
+    <input type="text" id="searchBar" placeholder="Search Songs..." />
+</div>
 
-    <div id="songList"></div>
+<div id="songList"></div>
 
-    <div id="songDetail">
-        <span id="closeDetail">×</span>
-        <h2 id="songName"></h2>
-        <img id="songImage" alt="Album Art" />
-        <div id="buttonContainer">
-            <button id="resetButton">
-                <img src="reset.png" alt="Reset" width="30px" />
-            </button>
-            <button id="playPauseButton">
-                <img id="playPauseIcon" src="play.png" alt="Play/Pause" />
-            </button>
-            <button id="muteButton">
-                <img src="mute.png" alt="Mute" width="30px" />
-            </button>
-        </div>
-        <audio id="audioPlayer" controls></audio>
+<div id="songDetail">
+    <span id="closeDetail">×</span>
+    <h2 id="songName"></h2>
+    <img id="songImage" alt="Album Art" />
+    <div id="buttonContainer">
+        <button id="playPauseButton">
+            <img id="playPauseIcon" src="play.png" alt="Play/Pause" />
+        </button>
     </div>
+    <audio id="audioPlayer" controls style="display: none;"></audio>
+</div>
     <script>
-let songData = [];
-let currentlyPlayingSong = null;
-let isPlaying = false;
+    let songData = [];
+let activePlayers = {};
 
 fetch('songs.json')
     .then(response => response.json())
@@ -203,66 +196,58 @@ function displaySongs(songs) {
         songItem.innerText = title;
 
         songItem.onclick = () => {
-            currentlyPlayingSong = title;
-            document.getElementById('songName').innerText = title;
-            document.getElementById('songImage').src = image;
-            document.getElementById('audioPlayer').src = file;
-
-            document.getElementById('songDetail').style.display = 'block';
+            openSongDetail(title, file, image);
         };
 
         songList.appendChild(songItem);
     });
 }
 
-document.getElementById('closeDetail').onclick = () => {
-    document.getElementById('songDetail').style.display = 'none';
-};
+function openSongDetail(title, file, image) {
+    document.getElementById('songName').innerText = title;
+    document.getElementById('songImage').src = image;
 
-const playPauseButton = document.getElementById('playPauseButton');
-const playPauseIcon = document.getElementById('playPauseIcon');
-const audioPlayer = document.getElementById('audioPlayer');
-
-playPauseButton.onclick = () => {
-    if (audioPlayer.src && audioPlayer.src.endsWith(`${currentlyPlayingSong}.mp3`)) {
-        if (audioPlayer.paused) {
-            audioPlayer.play();
-            isPlaying = true;
-        } else {
-            audioPlayer.pause();
-            isPlaying = false;
-        }
-        updatePlayPauseIcon();
-    }
-};
-
-const resetButton = document.getElementById('resetButton');
-resetButton.onclick = () => {
-    audioPlayer.currentTime = 0;
-};
-
-const muteButton = document.getElementById('muteButton');
-let isMuted = false;
-
-muteButton.onclick = () => {
-    if (!isMuted) {
-        audioPlayer.volume = 0;
-        isMuted = true;
+    // Create or retrieve the audio player for the song
+    let audioPlayer;
+    if (!activePlayers[title]) {
+        audioPlayer = new Audio(file);
+        audioPlayer.id = `audioPlayer_${title}`;
+        audioPlayer.controls = true;
+        audioPlayer.style.display = 'none';
+        activePlayers[title] = { player: audioPlayer, isPlaying: false };
     } else {
-        audioPlayer.volume = 1;
-        isMuted = false;
+        audioPlayer = activePlayers[title].player;
     }
-};
 
-function updatePlayPauseIcon() {
-    playPauseIcon.src = isPlaying ? 'pause.png' : 'play.png';
+    // Show the song detail window
+    document.getElementById('songDetail').style.display = 'block';
+
+    // Handle play/pause button for this song
+    const playPauseButton = document.getElementById('playPauseButton');
+    const playPauseIcon = document.getElementById('playPauseIcon');
+
+    playPauseButton.onclick = () => {
+        if (activePlayers[title].isPlaying) {
+            audioPlayer.pause();
+            activePlayers[title].isPlaying = false;
+        } else {
+            audioPlayer.play();
+            activePlayers[title].isPlaying = true;
+        }
+        updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
+    };
+
+    // Close the detail view without stopping the song
+    document.getElementById('closeDetail').onclick = () => {
+        document.getElementById('songDetail').style.display = 'none';
+        // Keep the song playing in the background if it is still playing
+    };
 }
 
-audioPlayer.onended = () => {
-    isPlaying = false;
-    updatePlayPauseIcon();
-};
-</script>
+function updatePlayPauseIcon(icon, isPlaying) {
+    icon.src = isPlaying ? 'pause.png' : 'play.png';
+}
+            </script>
     <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
