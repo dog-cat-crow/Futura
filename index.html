@@ -160,6 +160,7 @@
     </div>
     <audio id="audioPlayer" controls style="display: none;"></audio>
 </div>
+    <script>
     let songData = [];
 let activePlayers = {};
 
@@ -246,6 +247,7 @@ function openSongDetail(title, file, image) {
 function updatePlayPauseIcon(icon, isPlaying) {
     icon.src = isPlaying ? 'pause.png' : 'play.png';
 }
+            </script>
     <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
