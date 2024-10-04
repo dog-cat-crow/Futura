@@ -160,101 +160,92 @@
     </div>
     <audio id="audioPlayer" controls style="display: none;"></audio>
 </div>
-    <script>
     let songData = [];
-    let activePlayers = {};
+let activePlayers = {};
 
-    fetch('songs.json')
-        .then(response => response.json())
-        .then(data => {
-            songData = data.songs;
-            displaySongs(songData);
-        })
-        .catch(error => {
-            console.error('Error fetching songs:', error);
-        });
-
-    const searchBar = document.getElementById('searchBar');
-    searchBar.addEventListener('input', () => {
-        const query = searchBar.value.toLowerCase();
-        const filteredSongs = songData.filter(song => song.toLowerCase().includes(query));
-        displaySongs(filteredSongs);
+fetch('songs.json')
+    .then(response => response.json())
+    .then(data => {
+        songData = data.songs;
+        displaySongs(songData);
+    })
+    .catch(error => {
+        console.error('Error fetching songs:', error);
     });
 
-    function displaySongs(songs) {
-        const songList = document.getElementById('songList');
-        songList.innerHTML = '';
+const searchBar = document.getElementById('searchBar');
+searchBar.addEventListener('input', () => {
+    const query = searchBar.value.toLowerCase();
+    const filteredSongs = songData.filter(song => song.toLowerCase().includes(query));
+    displaySongs(filteredSongs);
+});
 
-        songs.forEach(title => {
-            const songItem = document.createElement('div');
-            songItem.classList.add('songItem');
-            const file = `${title}.mp3`;
-            const image = `${title}.jpg`;
+function displaySongs(songs) {
+    const songList = document.getElementById('songList');
+    songList.innerHTML = '';
 
-            songItem.dataset.song = file;
-            songItem.dataset.image = image;
-            songItem.innerText = title;
+    songs.forEach(title => {
+        const songItem = document.createElement('div');
+        songItem.classList.add('songItem');
+        const file = `${title}.mp3`;
+        const image = `${title}.jpg`;
 
-            songItem.onclick = () => {
-                openSongDetail(title, file, image);
-            };
+        songItem.dataset.song = file;
+        songItem.dataset.image = image;
+        songItem.innerText = title;
 
-            songList.appendChild(songItem);
-        });
+        songItem.onclick = () => {
+            openSongDetail(title, file, image);
+        };
+
+        songList.appendChild(songItem);
+    });
+}
+
+function openSongDetail(title, file, image) {
+    document.getElementById('songName').innerText = title;
+    document.getElementById('songImage').src = image;
+
+    // Create or retrieve the audio player for the song
+    let audioPlayer;
+    if (!activePlayers[title]) {
+        audioPlayer = new Audio(file);
+        audioPlayer.id = `audioPlayer_${title}`;
+        audioPlayer.controls = true;
+        audioPlayer.style.display = 'none';
+        activePlayers[title] = { player: audioPlayer, isPlaying: false };
+    } else {
+        audioPlayer = activePlayers[title].player;
     }
 
-    function openSongDetail(title, file, image) {
-        document.getElementById('songName').innerText = title;
-        document.getElementById('songImage').src = image;
+    // Show the song detail window
+    document.getElementById('songDetail').style.display = 'block';
 
-        // Check if the player for this song already exists
-        let audioPlayer = document.getElementById(`audioPlayer_${title}`);
-        if (!audioPlayer) {
-            // Create a new audio player for the song if it doesn't exist
-            audioPlayer = document.createElement('audio');
-            audioPlayer.src = file;
-            audioPlayer.id = `audioPlayer_${title}`;
-            audioPlayer.controls = true;
-            audioPlayer.style.display = 'none';
-            document.getElementById('songDetail').appendChild(audioPlayer);
-            activePlayers[title] = { player: audioPlayer, isPlaying: false };
+    // Handle play/pause button for this song
+    const playPauseButton = document.getElementById('playPauseButton');
+    const playPauseIcon = document.getElementById('playPauseIcon');
+
+    playPauseButton.onclick = () => {
+        if (activePlayers[title].isPlaying) {
+            audioPlayer.pause();
+            activePlayers[title].isPlaying = false;
+        } else {
+            audioPlayer.play();
+            activePlayers[title].isPlaying = true;
         }
+        updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
+    };
 
-        // Show the song detail window
-        document.getElementById('songDetail').style.display = 'block';
+    // Close the detail view without stopping the song
+    document.getElementById('closeDetail').onclick = () => {
+        document.getElementById('songDetail').style.display = 'none';
+        // Keep the song playing in the background if it is still playing
+    };
+}
 
-        // Handle play/pause button for this song
-        const playPauseButton = document.getElementById('playPauseButton');
-        const playPauseIcon = document.getElementById('playPauseIcon');
-
-        playPauseButton.onclick = () => {
-            if (activePlayers[title].isPlaying) {
-                audioPlayer.pause();
-                activePlayers[title].isPlaying = false;
-            } else {
-                // Pause any other playing songs before playing the new one
-                for (const key in activePlayers) {
-                    if (activePlayers[key].isPlaying && key !== title) {
-                        activePlayers[key].player.pause();
-                        activePlayers[key].isPlaying = false;
-                    }
-                }
-                audioPlayer.play();
-                activePlayers[title].isPlaying = true;
-            }
-            updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
-        };
-
-        // Close the detail view without stopping the song
-        document.getElementById('closeDetail').onclick = () => {
-            document.getElementById('songDetail').style.display = 'none';
-        };
-    }
-
-    function updatePlayPauseIcon(icon, isPlaying) {
-        icon.src = isPlaying ? 'pause.png' : 'play.png';
-    }
-</script>
+function updatePlayPauseIcon(icon, isPlaying) {
+    icon.src = isPlaying ? 'pause.png' : 'play.png';
+}
     <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
