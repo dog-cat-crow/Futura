@@ -166,8 +166,9 @@
         </div>
         <audio id="audioPlayer" controls></audio>
     </div>
-<script>
+            <script>
     let songData = [];
+    let currentlyPlayingSong = null;
 
     fetch('songs.json')
         .then(response => response.json())
@@ -201,9 +202,16 @@
             songItem.innerText = title;
 
             songItem.onclick = () => {
+                currentlyPlayingSong = title;
                 document.getElementById('songName').innerText = title;
                 document.getElementById('songImage').src = image;
                 document.getElementById('audioPlayer').src = file;
+
+                // Check if the song is already playing
+                if (audioPlayer.src !== file) {
+                    audioPlayer.play();
+                    playPauseIcon.src = 'pause.png';
+                }
                 document.getElementById('songDetail').style.display = 'block';
             };
 
@@ -249,9 +257,18 @@
             isMuted = false;
         }
     };
-</script>
-   
 
+    // Handle resuming the currently playing song when reopening the detail view
+    const songDetail = document.getElementById('songDetail');
+    songDetail.addEventListener('show', () => {
+        if (currentlyPlayingSong) {
+            const songFile = `${currentlyPlayingSong}.mp3`;
+            audioPlayer.src = songFile;
+            audioPlayer.play();
+            playPauseIcon.src = 'pause.png';
+        }
+    });
+</script>
     <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
