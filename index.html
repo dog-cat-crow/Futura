@@ -117,18 +117,19 @@
             justify-content: center;
             padding: 0 60px;
         }
-        #playPauseButton {
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        #playPauseIcon {
-            max-width: 70px;
-            max-height: 70px;
-        }
+        .playPauseButton {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.playPauseIcon {
+    max-width: 70px;
+    max-height: 70px;
+}
         #audioPlayer {
             display: none;
         }
@@ -222,10 +223,11 @@ function openSongDetail(title, file, image) {
     document.getElementById('songDetail').style.display = 'block';
 
     // Handle play/pause button for this song
-    const playPauseButton = document.getElementById('playPauseButton');
-    const playPauseIcon = document.getElementById('playPauseIcon');
-    playPauseButton.id = `playPauseButton_${title}`; // Unique ID for the button
-    playPauseIcon.id = `playPauseIcon_${title}`; // Unique ID for the icon
+    const playPauseButton = document.createElement('button');
+playPauseButton.classList.add('playPauseButton');
+
+const playPauseIcon = document.createElement('img');
+playPauseIcon.classList.add('playPauseIcon');
 
     // Update the play/pause button based on the current state
     updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
