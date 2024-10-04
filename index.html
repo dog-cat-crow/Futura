@@ -166,10 +166,11 @@
         </div>
         <audio id="audioPlayer" controls></audio>
     </div>
-            <script>
+    <script>
     let songData = [];
     let currentlyPlayingSong = null;
     let isPlaying = false;
+    let isMuted = false;
 
     fetch('songs.json')
         .then(response => response.json())
@@ -203,13 +204,20 @@
             songItem.innerText = title;
 
             songItem.onclick = () => {
-                currentlyPlayingSong = title;
-                document.getElementById('songName').innerText = title;
-                document.getElementById('songImage').src = image;
-                document.getElementById('audioPlayer').src = file;
+                if (currentlyPlayingSong !== title) {
+                    currentlyPlayingSong = title;
+                    document.getElementById('songName').innerText = title;
+                    document.getElementById('songImage').src = image;
+                    document.getElementById('audioPlayer').src = file;
 
-                // Only display the player without playing the song
-                document.getElementById('songDetail').style.display = 'block';
+                    document.getElementById('songDetail').style.display = 'block';
+
+                    if (isPlaying) {
+                        audioPlayer.pause();
+                        isPlaying = false;
+                        updatePlayPauseIcon();
+                    }
+                }
             };
 
             songList.appendChild(songItem);
@@ -248,8 +256,6 @@
     };
 
     const muteButton = document.getElementById('muteButton');
-    let isMuted = false;
-
     muteButton.onclick = () => {
         if (!isMuted) {
             audioPlayer.volume = 0;
@@ -262,17 +268,34 @@
         }
     };
 
-    // Update play/pause icon based on the state
     function updatePlayPauseIcon() {
         playPauseIcon.src = isPlaying ? 'pause.png' : 'play.png';
     }
 
-    // Add event listener to handle when the song ends
     audioPlayer.onended = () => {
         isPlaying = false;
         updatePlayPauseIcon();
     };
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(registration => {
+                    console.log('Service Worker registered with scope:', registration.scope);
+                })
+                .catch(error => {
+                    console.error('Service Worker registration failed:', error);
+                });
+        });
+    }
+
+    if (navigator.serviceWorker) {
+        navigator.serviceWorker.ready.then((registration) => {
+            registration.active.postMessage({ type: 'CACHE_SONGS' });
+        });
+    }
 </script>
+    <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('service-worker.js')
