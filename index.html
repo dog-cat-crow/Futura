@@ -269,6 +269,68 @@ function updatePlayPauseIcon(icon, isPlaying) {
         });
     }
 </script>
+<script>
+    let currentlyPlayingSong = null;
 
+    function openSongDetail(title, file, image) {
+        document.getElementById('songName').innerText = title;
+        document.getElementById('songImage').src = image;
+
+        let audioPlayer;
+        if (!activePlayers[title]) {
+            audioPlayer = new Audio(file);
+            audioPlayer.id = `audioPlayer_${title}`;
+            audioPlayer.style.display = 'none';
+            activePlayers[title] = { player: audioPlayer, isPlaying: false };
+        } else {
+            audioPlayer = activePlayers[title].player;
+        }
+
+        // Close the detail view without stopping the song
+        document.getElementById('closeDetail').onclick = () => {
+            document.getElementById('songDetail').style.display = 'none';
+        };
+
+        // Show the song detail window
+        document.getElementById('songDetail').style.display = 'block';
+
+        // Handle play/pause button for this song
+        const playPauseButton = document.getElementById('playPauseButton');
+        const playPauseIcon = document.getElementById('playPauseIcon');
+
+        playPauseButton.onclick = () => {
+            if (currentlyPlayingSong && currentlyPlayingSong !== title) {
+                activePlayers[currentlyPlayingSong].player.pause();
+                activePlayers[currentlyPlayingSong].isPlaying = false;
+                updatePlayPauseIcon(document.getElementById(`playPauseIcon_${currentlyPlayingSong}`), false);
+            }
+
+            if (activePlayers[title].isPlaying) {
+                audioPlayer.pause();
+                activePlayers[title].isPlaying = false;
+                currentlyPlayingSong = null; // Reset since the song is paused
+            } else {
+                audioPlayer.play();
+                activePlayers[title].isPlaying = true;
+                currentlyPlayingSong = title; // Set the currently playing song
+            }
+            updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
+        };
+        
+        // Update play/pause icon for currently playing song in the list
+        const allSongItems = document.querySelectorAll('.songItem');
+        allSongItems.forEach(item => {
+            const itemTitle = item.innerText;
+            const itemIcon = document.createElement('img');
+            itemIcon.id = `playPauseIcon_${itemTitle}`;
+            itemIcon.src = activePlayers[itemTitle] && activePlayers[itemTitle].isPlaying ? 'pause.png' : 'play.png';
+            item.appendChild(itemIcon);
+        });
+    }
+
+    function updatePlayPauseIcon(icon, isPlaying) {
+        icon.src = isPlaying ? 'pause.png' : 'play.png';
+    }
+</script>
 </body>
 </html>
