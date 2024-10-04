@@ -170,7 +170,6 @@
     let songData = [];
     let currentlyPlayingSong = null;
     let isPlaying = false;
-    let activeSong = null;
 
     fetch('songs.json')
         .then(response => response.json())
@@ -196,6 +195,7 @@
         songs.forEach(title => {
             const songItem = document.createElement('div');
             songItem.classList.add('songItem');
+
             const file = `${title}.mp3`;
             const image = `${title}.jpg`;
 
@@ -204,17 +204,12 @@
             songItem.innerText = title;
 
             songItem.onclick = () => {
+                currentlyPlayingSong = title;
                 document.getElementById('songName').innerText = title;
                 document.getElementById('songImage').src = image;
                 document.getElementById('audioPlayer').src = file;
 
-                // Only display the player without playing the song
                 document.getElementById('songDetail').style.display = 'block';
-
-                // Prevent automatic play when opening a new song window
-                if (currentlyPlayingSong !== file) {
-                    document.getElementById('audioPlayer').pause();
-                }
             };
 
             songList.appendChild(songItem);
@@ -230,12 +225,10 @@
     const audioPlayer = document.getElementById('audioPlayer');
 
     playPauseButton.onclick = () => {
-        if (audioPlayer.src) {
+        if (audioPlayer.src && audioPlayer.src.endsWith(`${currentlyPlayingSong}.mp3`)) {
             if (audioPlayer.paused) {
-                // Play the song and set it as active
                 audioPlayer.play();
                 isPlaying = true;
-                activeSong = audioPlayer.src;
             } else {
                 audioPlayer.pause();
                 isPlaying = false;
@@ -247,7 +240,7 @@
     const resetButton = document.getElementById('resetButton');
     resetButton.onclick = () => {
         audioPlayer.currentTime = 0;
-        if (activeSong) {
+        if (currentlyPlayingSong) {
             audioPlayer.play();
             isPlaying = true;
             updatePlayPauseIcon();
@@ -276,7 +269,6 @@
     audioPlayer.onended = () => {
         isPlaying = false;
         updatePlayPauseIcon();
-        activeSong = null; // Mark the song as inactive when it ends
     };
 </script>
     <script>
