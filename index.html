@@ -207,14 +207,18 @@
         document.getElementById('songName').innerText = title;
         document.getElementById('songImage').src = image;
 
-        // Create a new audio player for the song
-        const audioPlayer = document.createElement('audio');
-        audioPlayer.src = file;
-        audioPlayer.id = `audioPlayer_${title}`;
-        audioPlayer.controls = true;
-        audioPlayer.style.display = 'none';
-        document.getElementById('songDetail').appendChild(audioPlayer);
-        activePlayers[title] = { player: audioPlayer, isPlaying: false };
+        // Check if the player for this song already exists
+        let audioPlayer = document.getElementById(`audioPlayer_${title}`);
+        if (!audioPlayer) {
+            // Create a new audio player for the song if it doesn't exist
+            audioPlayer = document.createElement('audio');
+            audioPlayer.src = file;
+            audioPlayer.id = `audioPlayer_${title}`;
+            audioPlayer.controls = true;
+            audioPlayer.style.display = 'none';
+            document.getElementById('songDetail').appendChild(audioPlayer);
+            activePlayers[title] = { player: audioPlayer, isPlaying: false };
+        }
 
         // Show the song detail window
         document.getElementById('songDetail').style.display = 'block';
@@ -228,18 +232,22 @@
                 audioPlayer.pause();
                 activePlayers[title].isPlaying = false;
             } else {
+                // Pause any other playing songs before playing the new one
+                for (const key in activePlayers) {
+                    if (activePlayers[key].isPlaying && key !== title) {
+                        activePlayers[key].player.pause();
+                        activePlayers[key].isPlaying = false;
+                    }
+                }
                 audioPlayer.play();
                 activePlayers[title].isPlaying = true;
             }
             updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
         };
 
-        // Close the detail view
+        // Close the detail view without stopping the song
         document.getElementById('closeDetail').onclick = () => {
-            audioPlayer.pause(); // Pause the song if detail is closed
-            audioPlayer.remove(); // Remove the audio player
             document.getElementById('songDetail').style.display = 'none';
-            delete activePlayers[title]; // Clean up active players
         };
     }
 
