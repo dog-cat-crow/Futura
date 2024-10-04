@@ -150,7 +150,7 @@
     </button>
     <audio id="audioPlayer" controls style="display: none;"></audio>
 </div>
-    <script>
+     <script>
 let songData = [];
 let activePlayers = {};
 
@@ -210,18 +210,25 @@ function openSongDetail(title, file, image) {
         audioPlayer = activePlayers[title].player;
     }
 
-    // Dynamically position the play/pause button 60px below the image
+    // Get the image's position
+    const imageRect = songImage.getBoundingClientRect();
+
+    // Retrieve the play/pause button and icon
     const playPauseButton = document.getElementById('playPauseButton');
     const playPauseIcon = document.getElementById('playPauseIcon');
 
-    const imageRect = songImage.getBoundingClientRect(); // Get the image's position
-    playPauseButton.style.top = (imageRect.bottom + 60) + 'px'; // 60px below image
+    // Set button size and position
+    playPauseButton.style.width = '60px';  // Set width to 60px
+    playPauseButton.style.height = '60px'; // Set height to 60px
+    playPauseButton.style.position = 'absolute';
+    playPauseButton.style.top = (imageRect.bottom + 60) + 'px'; // 60px below the image
     playPauseButton.style.left = '50%'; // Center horizontally
-    playPauseButton.style.transform = 'translateX(-50%)'; // Adjust for button width
+    playPauseButton.style.transform = 'translateX(-50%)'; // Adjust for centering
 
-    // Update the play/pause button based on the current state
+    // Update the play/pause icon based on the current state
     updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
 
+    // Play/Pause button click event
     playPauseButton.onclick = () => {
         if (activePlayers[title].isPlaying) {
             audioPlayer.pause();
