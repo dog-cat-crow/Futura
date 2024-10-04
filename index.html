@@ -135,6 +135,24 @@
         #searchBar {
             color: white;
         }
+        .songItem {
+    background-color: #212121;
+    border-radius: 0px;
+    border: 1px solid white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* This will help align items inside */
+    width: 80%;
+    padding: 10px;
+    margin: 5px 0;
+    cursor: pointer;
+    font-family: 'Poppins';
+    font-size: 20px;
+}
+
+.songItem img {
+    margin-left: auto; /* This aligns the image to the right */
+}
     </style>
 </head>
 <body>
@@ -195,10 +213,22 @@ function displaySongs(songs) {
         songItem.dataset.image = image;
         songItem.innerText = title;
 
+        // Create the download button
+        const downloadButton = document.createElement('a');
+        downloadButton.href = file; // Set the download link
+        downloadButton.download = file; // Set the download attribute
+        downloadButton.innerHTML = '<img src="Download.png" alt="Download" style="width: 24px; height: 24px;"/>';
+
+        // Align the download button to the right
+        downloadButton.style.marginLeft = 'auto';
+        downloadButton.style.display = 'flex';
+        downloadButton.style.alignItems = 'center';
+
         songItem.onclick = () => {
             openSongDetail(title, file, image);
         };
 
+        songItem.appendChild(downloadButton); // Add the download button to the song item
         songList.appendChild(songItem);
     });
 }
