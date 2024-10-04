@@ -305,6 +305,14 @@
     }
 </script>
 
+<script>
+    // Send a message to the service worker to cache song files
+    if (navigator.serviceWorker) {
+        navigator.serviceWorker.ready.then((registration) => {
+            registration.active.postMessage({ type: 'CACHE_SONGS' });
+        });
+    }
+</script>
 
 </body>
 </html>
