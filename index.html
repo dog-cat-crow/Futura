@@ -167,95 +167,78 @@
         <audio id="audioPlayer" controls></audio>
     </div>
     <script>
-let songData = [];
-let currentlyPlayingSong = null;
 let activePlayer = null;
-let audioPlayer = null;
+let activeSong = null;
 
-fetch('songs.json')
-    .then(response => response.json())
-    .then(data => {
-        songData = data.songs;
-        displaySongs(songData);
-    })
-    .catch(error => {
-        console.error('Error fetching songs:', error);
-    });
+const songs = [
+    "Alone Part II",
+    "Animals",
+    "Fly Away",
+    "Dynamite",
+    "Dusk Till Dawn",
+    "Calm Down",
+    "Blinding Lights",
+    "Enemy (with JID)",
+    "Faded",
+    "Heat Waves",
+    "Ignite",
+    "Symphony",
+    "Stick Together",
+    "Levitating"
+];
 
-const searchBar = document.getElementById('searchBar');
-searchBar.addEventListener('input', () => {
-    const query = searchBar.value.toLowerCase();
-    const filteredSongs = songData.filter(song => song.toLowerCase().includes(query));
-    displaySongs(filteredSongs);
-});
+songs.forEach(song => {
+    const songName = song.replace(/ /g, "_");
+    const audio = new Audio(`${song}.mp3`);
 
-function displaySongs(songs) {
-    const songList = document.getElementById('songList');
-    songList.innerHTML = '';
+    const playerWindow = document.createElement('div');
+    playerWindow.classList.add('player-window');
+    playerWindow.innerHTML = `
+        <h3>${song}</h3>
+        <button class="playpause-btn" id="${songName}_playpause">Play</button>
+        <button class="close-btn" id="${songName}_close">Close</button>
+    `;
+    document.body.appendChild(playerWindow);
 
-    songs.forEach(title => {
-        const songItem = document.createElement('div');
-        songItem.classList.add('songItem');
-        const file = `${title}.mp3`;
-        const image = `${title}.jpg`;
+    const playPauseButton = playerWindow.querySelector('.playpause-btn');
+    const closeButton = playerWindow.querySelector('.close-btn');
 
-        songItem.dataset.song = file;
-        songItem.dataset.image = image;
-        songItem.innerText = title;
-
-        songItem.onclick = () => {
+    playPauseButton.addEventListener('click', () => {
+        if (activeSong !== song) {
             if (activePlayer) {
-                activePlayer.style.display = 'none';
-                audioPlayer.pause();
+                activePlayer.pause();
+                document.getElementById(activeSong.replace(/ /g, "_") + "_playpause").innerText = "Play";
             }
-
-            currentlyPlayingSong = title;
-            document.getElementById('songName').innerText = title;
-            document.getElementById('songImage').src = image;
-            audioPlayer = document.getElementById('audioPlayer');
-            audioPlayer.src = file;
-            audioPlayer.play();
-
-            document.getElementById('songDetail').style.display = 'block';
-            activePlayer = document.getElementById('songDetail');
-            updatePlayPauseIcon(true);
-        };
-
-        songList.appendChild(songItem);
-    });
-}
-
-document.getElementById('closeDetail').onclick = () => {
-    document.getElementById('songDetail').style.display = 'none';
-    if (audioPlayer) {
-        audioPlayer.pause();
-        updatePlayPauseIcon(false);
-    }
-};
-
-const playPauseButton = document.getElementById('playPauseButton');
-const playPauseIcon = document.getElementById('playPauseIcon');
-
-playPauseButton.onclick = () => {
-    if (audioPlayer && audioPlayer.src.endsWith(`${currentlyPlayingSong}.mp3`)) {
-        if (audioPlayer.paused) {
-            audioPlayer.play();
-            updatePlayPauseIcon(true);
+            audio.play();
+            activePlayer = audio;
+            activeSong = song;
+            playPauseButton.innerText = "Pause";
         } else {
-            audioPlayer.pause();
-            updatePlayPauseIcon(false);
+            if (audio.paused) {
+                audio.play();
+                playPauseButton.innerText = "Pause";
+            } else {
+                audio.pause();
+                playPauseButton.innerText = "Play";
+            }
         }
-    }
-};
+    });
 
-function updatePlayPauseIcon(isPlaying) {
-    playPauseIcon.src = isPlaying ? 'pause.png' : 'play.png';
-}
+    closeButton.addEventListener('click', () => {
+        audio.pause();
+        playPauseButton.innerText = "Play";
+        activePlayer = null;
+        activeSong = null;
+        playerWindow.remove();
+    });
 
-audioPlayer.onended = () => {
-    updatePlayPauseIcon(false);
-    currentlyPlayingSong = null;
-};
+    audio.addEventListener('ended', () => {
+        playPauseButton.innerText = "Play";
+        activePlayer = null;
+        activeSong = null;
+        playerWindow.remove();
+    });
+});
 </script>
 <script>
     if (navigator.serviceWorker) {
