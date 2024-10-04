@@ -216,29 +216,17 @@
 
             // Add event listener for opening the player UI
             songItem.onclick = () => {
-                if (currentSong !== file) {
-                    // If a different song is clicked
-                    currentSong = file; // Update current song
-                    isPlaying = true; // Set playing state to true
-                    audioPlayer.src = file; // Set new audio source
-                    audioPlayer.play(); // Play the new song
-                    updatePlayPauseButton('pause'); // Update button to pause
-                    localStorage.setItem('currentSong', currentSong); // Save current song
-                    localStorage.setItem('isPlaying', 'true'); // Save playing state
-                } else {
-                    // If the same song is clicked
-                    if (audioPlayer.paused) {
-                        audioPlayer.play(); // Play if paused
-                        updatePlayPauseButton('pause');
-                        isPlaying = true;
-                        localStorage.setItem('isPlaying', 'true'); // Save playing state
-                    } else {
-                        audioPlayer.pause(); // Pause if playing
-                        updatePlayPauseButton('play');
-                        isPlaying = false;
-                        localStorage.setItem('isPlaying', 'false'); // Save paused state
-                    }
-                }
+    document.getElementById('songName').innerText = title;
+    document.getElementById('songImage').src = image;
+    document.getElementById('audioPlayer').src = file;
+    document.getElementById('songDetail').style.display = 'block';
+
+    // Remove the auto-play functionality
+    isPlaying = false;
+    updatePlayPauseButton('play'); // Ensure the play button is shown
+    localStorage.setItem('currentSong', title); // Save the current song
+    localStorage.setItem('isPlaying', 'false'); // Song is not playing yet
+};
                 document.getElementById('songName').innerText = title;
                 document.getElementById('songImage').src = image;
                 document.getElementById('songDetail').style.display = 'block';
