@@ -63,30 +63,30 @@
         }
         .songItem {
             background-color: #212121;
-            border-radius: 0px; /* Sharp edges */
-            border: 1px solid white; /* Thin white border */
+            border-radius: 0px;
+            border: 1px solid white;
             display: flex;
             align-items: center;
-            justify-content: center; /* Center the text */
-            width: 80%; /* Reduced horizontal length */
+            justify-content: center;
+            width: 80%;
             padding: 10px;
             margin: 5px 0;
-            cursor: pointer; /* Make the entire box clickable */
-            font-family: 'Poppins'; /* Use the Poppins font */
+            cursor: pointer;
+            font-family: 'Poppins';
             font-size: 20px;
         }
         .songItem:hover {
             background-color: #2b2b2b;
         }
         #songDetail {
-            padding: 0; /* Remove padding to use full screen */
+            padding: 0;
             position: fixed;
-            top: 0; /* Align to top */
-            left: 0; /* Align to left */
-            width: 100vw; /* Use full viewport width */
-            height: 100vh; /* Use full viewport height */
-            background-color: #303030; /* Set opaque background color */
-            display: none; /* Still hidden by default */
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #303030;
+            display: none;
         }
         #closeDetail {
             position: absolute;
@@ -109,29 +109,32 @@
             margin-right: auto;
         }
         #buttonContainer {
-            position: absolute; /* Position it absolutely */
-            top: 300px; /* Align buttons vertically */
-            left: 0; /* Start from the left */
-            right: 0; /* Extend to the right */
-            display: flex; /* Use flexbox for layout */
-            justify-content: space-between; /* Distribute buttons evenly */
-            padding: 0 60px; /* 60px padding on left and right */
+            position: absolute;
+            top: 300px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 60px;
         }
         #playPauseButton, #resetButton, #muteButton {
-            background: transparent; /* Keep background transparent */
-            border: none; /* Remove border */
-            cursor: pointer; /* Change cursor on hover */
-            display: flex; /* Flex to center icon */
-            align-items: center; /* Center vertically */
-            justify-content: center; /* Center horizontally */
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         #playPauseIcon {
-            max-width: 70px; /* Maximum width for the icon */
-            max-height: 70px; /* Maximum height for the icon */
+            max-width: 70px;
+            max-height: 70px;
         }
         #audioPlayer {
             display: none;
         }
+        #searchBar {
+    color: white;
+}
     </style>
 </head>
 <body>
@@ -165,146 +168,77 @@
     </div>
 
     <script>
-    let songData = []; // For storing filtered song titles
-    let currentSong = null; // Track the currently playing song
-    let isPlaying = false; // Track if the current song is playing
+    let audioPlayer = document.createElement('audio');
+    let isPlaying = false;
+    let isMuted = false;
+    
+    const playPauseButton = document.getElementById('playPauseButton');
+    const muteButton = document.getElementById('muteButton');
+    
+    
+    function showSongDetail(songName, songFile) {
+        const songDetail = document.getElementById('songDetail');
+        songDetail.style.display = 'block';
+        document.getElementById('songName').innerText = songName;
 
-    // Load and filter songs based on user search input
-    const searchBar = document.getElementById('searchBar');
-    searchBar.addEventListener('input', () => {
-        const query = searchBar.value.toLowerCase();
-        const filteredSongs = songData.filter(song => song.toLowerCase().includes(query));
-        displaySongs(filteredSongs);
-    });
-
-    // Fetch the songs from the JSON file
-    fetch('songs.json')
-        .then(response => response.json())
-        .then(data => {
-            songData = data.songs; // Load songs from JSON
-            displaySongs(songData); // Initial display of all songs
-
-            // Restore the previously played song state if available
-            const savedSong = localStorage.getItem('currentSong');
-            const savedPlayingState = localStorage.getItem('isPlaying');
-            if (savedSong && savedPlayingState === 'true') {
-                currentSong = savedSong;
-                isPlaying = true;
-                audioPlayer.src = currentSong;
-                audioPlayer.play();
-                updatePlayPauseButton('pause');
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching songs:', error);
-        });
-
-    // Function to display songs
-    function displaySongs(songs) {
-        const songList = document.getElementById('songList');
-        songList.innerHTML = ''; // Clear current list
-
-        songs.forEach(title => {
-            const songItem = document.createElement('div');
-            songItem.classList.add('songItem');
-            const file = `${title}.mp3`; // Construct the file path for audio
-            const image = `${title}.jpg`; // Construct the file path for image
-
-            songItem.dataset.song = file;
-            songItem.dataset.image = image;
-            songItem.innerText = title;
-
-            // Add event listener for opening the player UI
-            songItem.onclick = () => {
-    document.getElementById('songName').innerText = title;
-    document.getElementById('songImage').src = image;
-    document.getElementById('audioPlayer').src = file;
-    document.getElementById('songDetail').style.display = 'block';
-
-
-            songList.appendChild(songItem);
-        });
+        audioPlayer.src = songFile;
+        audioPlayer.play();
+        isPlaying = true;
+        updatePlayPauseIcon();
     }
 
-    // Close the song detail player
-    document.getElementById('closeDetail').onclick = () => {
-        document.getElementById('songDetail').style.display = 'none';
+    const songItems = document.getElementsByClassName('songItem');
+    for (let i = 0; i < songItems.length; i++) {
+        songItems[i].onclick = function () {
+            const songName = this.innerText;
+            const songFile = this.getAttribute('data-song');
+            showSongDetail(songName, songFile);
+        };
+    }
+
+    function hideSongDetail() {
+        const songDetail = document.getElementById('songDetail');
+        songDetail.style.display = 'none';
+        audioPlayer.pause();
+        isPlaying = false;
+        updatePlayPauseIcon();
+    }
+
+    document.getElementById('closeDetail').onclick = hideSongDetail;
+
+    muteButton.onclick = function () {
+        isMuted = !isMuted;
+        audioPlayer.muted = isMuted;
+        updateMuteButton();
     };
 
-    // Update play/pause button based on the current song state
-    function updatePlayPauseButton(state) {
-        if (state === 'pause') {
-            playPauseIcon.src = 'pause.png';
-        } else {
-            playPauseIcon.src = 'play.png';
-        }
-        // Update other song items to show play
-        const songItems = document.querySelectorAll('.songItem');
-        songItems.forEach(item => {
-            if (item.dataset.song !== currentSong) {
-                // Reset other song items to show play
-                item.dataset.playState = 'play';
-            }
-        });
+    function updateMuteButton() {
+        const muteIcon = document.getElementById('muteIcon');
+        muteIcon.src = isMuted ? 'unmute-icon.png' : 'mute-icon.png';
+        muteIcon.style.width = '70px';
+        muteIcon.style.height = '70px';
     }
 
-    // Play/pause button functionality
-    const playPauseButton = document.getElementById('playPauseButton');
-
-    playPauseButton.onclick = () => {
+    playPauseButton.onclick = function () {
         if (isPlaying) {
             audioPlayer.pause();
-            updatePlayPauseButton('play');
-            isPlaying = false;
-            localStorage.setItem('isPlaying', 'false'); // Save paused state
         } else {
             audioPlayer.play();
-            updatePlayPauseButton('pause');
-            isPlaying = true;
-            localStorage.setItem('isPlaying', 'true'); // Save playing state
         }
+        isPlaying = !isPlaying;
+        updatePlayPauseIcon();
     };
 
-    // Reset button functionality
-    const resetButton = document.getElementById('resetButton');
-    resetButton.onclick = () => {
-        audioPlayer.currentTime = 0; // Reset to the beginning
-        audioPlayer.play();
-        updatePlayPauseButton('pause');
-        isPlaying = true;
-        localStorage.setItem('isPlaying', 'true'); // Save playing state
+    function updatePlayPauseIcon() {
+        const playPauseIcon = document.getElementById('playPauseIcon');
+        playPauseIcon.src = isPlaying ? 'pause-icon.png' : 'play-icon.png';
+    }
+
+    audioPlayer.onended = function () {
+        isPlaying = false;
+        updatePlayPauseIcon();
     };
-
-    // Mute/unmute button functionality
-    const muteButton = document.getElementById('muteButton');
-    let isMuted = false; // Track mute state
-
-    muteButton.onclick = () => {
-        if (!isMuted) {
-            audioPlayer.volume = 0; // Mute the audio
-            muteButton.innerHTML = `<img src="unmute.png" alt="Unmute" width="30px" />`;
-            isMuted = true;
-        } else {
-            audioPlayer.volume = 1; // Unmute the audio
-            muteButton.innerHTML = `<img src="mute.png" alt="Mute" />`;
-            isMuted = false;
-        }
-    };
-
-    // Notify Android app when audio is played
-    audioPlayer.addEventListener('play', function() {
-        if (typeof Android !== 'undefined' && Android.onPlay) {
-            Android.onPlay(); // Call the Android app's onPlay() method
-        }
-    });
-
-    // Notify Android app when audio is paused
-    audioPlayer.addEventListener('pause', function() {
-        if (typeof Android !== 'undefined' && Android.onPause) {
-            Android.onPause(); // Call the Android app's onPause() method
-        }
-    });
-    </script>
+</script>
 
     <script>
     if ('serviceWorker' in navigator) {
@@ -321,7 +255,6 @@
 </script>
 
 <script>
-    // Send a message to the service worker to cache song files
     if (navigator.serviceWorker) {
         navigator.serviceWorker.ready.then((registration) => {
             registration.active.postMessage({ type: 'CACHE_SONGS' });
