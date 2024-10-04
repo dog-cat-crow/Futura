@@ -203,19 +203,12 @@ function displaySongs(songs) {
         songItem.innerText = title;
 
         songItem.onclick = () => {
-            if (currentlyPlayingSong !== title) {
-                if (currentlyPlayingSong) {
-                    pauseCurrentSong();
-                }
-                currentlyPlayingSong = title;
-                document.getElementById('songName').innerText = title;
-                document.getElementById('songImage').src = image;
-                document.getElementById('audioPlayer').src = file;
-                document.getElementById('songDetail').style.display = 'block';
-                playSong();
-            } else {
-                togglePlayPause();
-            }
+            currentlyPlayingSong = title;
+            document.getElementById('songName').innerText = title;
+            document.getElementById('songImage').src = image;
+            document.getElementById('audioPlayer').src = file;
+
+            document.getElementById('songDetail').style.display = 'block';
         };
 
         songList.appendChild(songItem);
@@ -231,15 +224,21 @@ const playPauseIcon = document.getElementById('playPauseIcon');
 const audioPlayer = document.getElementById('audioPlayer');
 
 playPauseButton.onclick = () => {
-    togglePlayPause();
+    if (audioPlayer.src && audioPlayer.src.endsWith(`${currentlyPlayingSong}.mp3`)) {
+        if (audioPlayer.paused) {
+            audioPlayer.play();
+            isPlaying = true;
+        } else {
+            audioPlayer.pause();
+            isPlaying = false;
+        }
+        updatePlayPauseIcon();
+    }
 };
 
 const resetButton = document.getElementById('resetButton');
 resetButton.onclick = () => {
     audioPlayer.currentTime = 0;
-    if (currentlyPlayingSong) {
-        playSong();
-    }
 };
 
 const muteButton = document.getElementById('muteButton');
@@ -248,38 +247,12 @@ let isMuted = false;
 muteButton.onclick = () => {
     if (!isMuted) {
         audioPlayer.volume = 0;
-        muteButton.innerHTML = `<img src="unmute.png" alt="Unmute" width="30px" />`;
         isMuted = true;
     } else {
         audioPlayer.volume = 1;
-        muteButton.innerHTML = `<img src="mute.png" alt="Mute" width="30px" />`;
         isMuted = false;
     }
 };
-
-function togglePlayPause() {
-    if (audioPlayer.src && audioPlayer.src.endsWith(`${currentlyPlayingSong}.mp3`)) {
-        if (audioPlayer.paused) {
-            playSong();
-        } else {
-            audioPlayer.pause();
-            isPlaying = false;
-            updatePlayPauseIcon();
-        }
-    }
-}
-
-function playSong() {
-    audioPlayer.play();
-    isPlaying = true;
-    updatePlayPauseIcon();
-}
-
-function pauseCurrentSong() {
-    audioPlayer.pause();
-    isPlaying = false;
-    updatePlayPauseIcon();
-}
 
 function updatePlayPauseIcon() {
     playPauseIcon.src = isPlaying ? 'pause.png' : 'play.png';
@@ -289,7 +262,6 @@ audioPlayer.onended = () => {
     isPlaying = false;
     updatePlayPauseIcon();
 };
-
 </script>
     <script>
     if ('serviceWorker' in navigator) {
