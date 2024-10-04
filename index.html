@@ -219,6 +219,11 @@ function displaySongs(songs) {
         downloadButton.download = file; // Set the download attribute
         downloadButton.innerHTML = '<img src="Download.png" alt="Download" style="width: 24px; height: 24px;"/>';
 
+        // Prevent the download button from triggering the songItem onclick event
+        downloadButton.addEventListener('click', (event) => {
+            event.stopPropagation(); // Prevents the parent onclick event
+        });
+
         // Align the download button to the right
         downloadButton.style.marginLeft = 'auto';
         downloadButton.style.display = 'flex';
@@ -231,6 +236,7 @@ function displaySongs(songs) {
         songItem.appendChild(downloadButton); // Add the download button to the song item
         songList.appendChild(songItem);
     });
+}
 }
 
 function openSongDetail(title, file, image) {
