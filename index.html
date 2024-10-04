@@ -169,6 +169,7 @@
             <script>
     let songData = [];
     let currentlyPlayingSong = null;
+    let isPlaying = false;
 
     fetch('songs.json')
         .then(response => response.json())
@@ -210,7 +211,8 @@
                 // Check if the song is already playing
                 if (audioPlayer.src !== file) {
                     audioPlayer.play();
-                    playPauseIcon.src = 'pause.png';
+                    isPlaying = true;
+                    updatePlayPauseIcon();
                 }
                 document.getElementById('songDetail').style.display = 'block';
             };
@@ -230,17 +232,20 @@
     playPauseButton.onclick = () => {
         if (audioPlayer.paused) {
             audioPlayer.play();
-            playPauseIcon.src = 'pause.png';
+            isPlaying = true;
         } else {
             audioPlayer.pause();
-            playPauseIcon.src = 'play.png';
+            isPlaying = false;
         }
+        updatePlayPauseIcon();
     };
 
     const resetButton = document.getElementById('resetButton');
     resetButton.onclick = () => {
         audioPlayer.currentTime = 0;
         audioPlayer.play();
+        isPlaying = true;
+        updatePlayPauseIcon();
     };
 
     const muteButton = document.getElementById('muteButton');
@@ -258,16 +263,16 @@
         }
     };
 
-    // Handle resuming the currently playing song when reopening the detail view
-    const songDetail = document.getElementById('songDetail');
-    songDetail.addEventListener('show', () => {
-        if (currentlyPlayingSong) {
-            const songFile = `${currentlyPlayingSong}.mp3`;
-            audioPlayer.src = songFile;
-            audioPlayer.play();
-            playPauseIcon.src = 'pause.png';
-        }
-    });
+    // Update play/pause icon based on the state
+    function updatePlayPauseIcon() {
+        playPauseIcon.src = isPlaying ? 'pause.png' : 'play.png';
+    }
+
+    // Add event listener to handle when the song ends
+    audioPlayer.onended = () => {
+        isPlaying = false;
+        updatePlayPauseIcon();
+    };
 </script>
     <script>
     if ('serviceWorker' in navigator) {
