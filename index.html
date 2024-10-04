@@ -161,7 +161,7 @@
     <audio id="audioPlayer" controls style="display: none;"></audio>
 </div>
     <script>
-    let songData = [];
+let songData = [];
 let activePlayers = {};
 
 fetch('songs.json')
@@ -212,7 +212,6 @@ function openSongDetail(title, file, image) {
     if (!activePlayers[title]) {
         audioPlayer = new Audio(file);
         audioPlayer.id = `audioPlayer_${title}`;
-        audioPlayer.controls = true;
         audioPlayer.style.display = 'none';
         activePlayers[title] = { player: audioPlayer, isPlaying: false };
     } else {
@@ -225,6 +224,11 @@ function openSongDetail(title, file, image) {
     // Handle play/pause button for this song
     const playPauseButton = document.getElementById('playPauseButton');
     const playPauseIcon = document.getElementById('playPauseIcon');
+    playPauseButton.id = `playPauseButton_${title}`; // Unique ID for the button
+    playPauseIcon.id = `playPauseIcon_${title}`; // Unique ID for the icon
+
+    // Update the play/pause button based on the current state
+    updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
 
     playPauseButton.onclick = () => {
         if (activePlayers[title].isPlaying) {
@@ -240,14 +244,13 @@ function openSongDetail(title, file, image) {
     // Close the detail view without stopping the song
     document.getElementById('closeDetail').onclick = () => {
         document.getElementById('songDetail').style.display = 'none';
-        // Keep the song playing in the background if it is still playing
     };
 }
 
 function updatePlayPauseIcon(icon, isPlaying) {
     icon.src = isPlaying ? 'pause.png' : 'play.png';
 }
-            </script>
+</script>
     <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
