@@ -208,12 +208,7 @@
                 document.getElementById('songImage').src = image;
                 document.getElementById('audioPlayer').src = file;
 
-                // Check if the song is already playing
-                if (audioPlayer.src !== file) {
-                    audioPlayer.play();
-                    isPlaying = true;
-                    updatePlayPauseIcon();
-                }
+                // Only display the player without playing the song
                 document.getElementById('songDetail').style.display = 'block';
             };
 
@@ -230,22 +225,26 @@
     const audioPlayer = document.getElementById('audioPlayer');
 
     playPauseButton.onclick = () => {
-        if (audioPlayer.paused) {
-            audioPlayer.play();
-            isPlaying = true;
-        } else {
-            audioPlayer.pause();
-            isPlaying = false;
+        if (audioPlayer.src && audioPlayer.src.endsWith(`${currentlyPlayingSong}.mp3`)) {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+                isPlaying = true;
+            } else {
+                audioPlayer.pause();
+                isPlaying = false;
+            }
+            updatePlayPauseIcon();
         }
-        updatePlayPauseIcon();
     };
 
     const resetButton = document.getElementById('resetButton');
     resetButton.onclick = () => {
         audioPlayer.currentTime = 0;
-        audioPlayer.play();
-        isPlaying = true;
-        updatePlayPauseIcon();
+        if (currentlyPlayingSong) {
+            audioPlayer.play();
+            isPlaying = true;
+            updatePlayPauseIcon();
+        }
     };
 
     const muteButton = document.getElementById('muteButton');
@@ -274,7 +273,6 @@
         updatePlayPauseIcon();
     };
 </script>
-    <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('service-worker.js')
