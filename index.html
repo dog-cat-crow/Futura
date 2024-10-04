@@ -195,9 +195,13 @@ function displaySongs(songs) {
 
 function openSongDetail(title, file, image) {
     document.getElementById('songName').innerText = title;
-    document.getElementById('songImage').src = image;
+    const songImage = document.getElementById('songImage');
+    songImage.src = image;
 
-    // Retrieve the audio player or create it if not already present
+    // Ensure songDetail is visible
+    document.getElementById('songDetail').style.display = 'block';
+
+    // Retrieve or create the audio player
     let audioPlayer;
     if (!activePlayers[title]) {
         audioPlayer = new Audio(file);
@@ -206,12 +210,14 @@ function openSongDetail(title, file, image) {
         audioPlayer = activePlayers[title].player;
     }
 
-    // Show the song detail window
-    document.getElementById('songDetail').style.display = 'block';
-
-    // Use the existing play/pause button and icon
+    // Dynamically position the play/pause button 60px below the image
     const playPauseButton = document.getElementById('playPauseButton');
     const playPauseIcon = document.getElementById('playPauseIcon');
+
+    const imageRect = songImage.getBoundingClientRect(); // Get the image's position
+    playPauseButton.style.top = (imageRect.bottom + 60) + 'px'; // 60px below image
+    playPauseButton.style.left = '50%'; // Center horizontally
+    playPauseButton.style.transform = 'translateX(-50%)'; // Adjust for button width
 
     // Update the play/pause button based on the current state
     updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
