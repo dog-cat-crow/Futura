@@ -45,7 +45,7 @@
             margin: 15px 0;
         }
         #searchBar {
-            width: 250px;
+            width: 300px;
             height: 40px;
             background-color: #212121;
             border: none;
@@ -63,30 +63,30 @@
         }
         .songItem {
             background-color: #212121;
-            border-radius: 0px;
-            border: 1px solid white;
+            border-radius: 0px; /* Sharp edges */
+            border: 1px solid white; /* Thin white border */
             display: flex;
             align-items: center;
-            justify-content: center;
-            width: 80%;
+            justify-content: center; /* Center the text */
+            width: 80%; /* Reduced horizontal length */
             padding: 10px;
             margin: 5px 0;
-            cursor: pointer;
-            font-family: 'Poppins';
+            cursor: pointer; /* Make the entire box clickable */
+            font-family: 'Poppins'; /* Use the Poppins font */
             font-size: 20px;
         }
         .songItem:hover {
             background-color: #2b2b2b;
         }
         #songDetail {
-            padding: 0;
+            padding: 0; /* Remove padding to use full screen */
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: #303030;
-            display: none;
+            top: 0; /* Align to top */
+            left: 0; /* Align to left */
+            width: 100vw; /* Use full viewport width */
+            height: 100vh; /* Use full viewport height */
+            background-color: #303030; /* Set opaque background color */
+            display: none; /* Still hidden by default */
         }
         #closeDetail {
             position: absolute;
@@ -108,142 +108,189 @@
             margin-left: auto;
             margin-right: auto;
         }
-        #playPauseButton {
-    /* Remove the existing size and position styles */
-}
-
-.playPauseIcon {
-    /* You can keep the icon styling as is or adjust it based on your needs */
-}
+        #buttonContainer {
+            position: absolute; /* Position it absolutely */
+            top: 300px; /* Align buttons vertically */
+            left: 0; /* Start from the left */
+            right: 0; /* Extend to the right */
+            display: flex; /* Use flexbox for layout */
+            justify-content: space-between; /* Distribute buttons evenly */
+            padding: 0 60px; /* 60px padding on left and right */
+        }
+        #playPauseButton, #resetButton, #muteButton {
+            background: transparent; /* Keep background transparent */
+            border: none; /* Remove border */
+            cursor: pointer; /* Change cursor on hover */
+            display: flex; /* Flex to center icon */
+            align-items: center; /* Center vertically */
+            justify-content: center; /* Center horizontally */
+        }
+        #playPauseIcon {
+            max-width: 70px; /* Maximum width for the icon */
+            max-height: 70px; /* Maximum height for the icon */
+        }
         #audioPlayer {
             display: none;
-        }
-        #searchBar {
-            color: white;
         }
     </style>
 </head>
 <body>
     <div id="header">
-    <h1>FUTURA</h1>
-    <h2>LISTEN AD-FREE</h2>
-</div>
+        <h1>FUTURA</h1>
+        <h2>LISTEN AD-FREE</h2>
+    </div>
 
-<div id="searchContainer">
-    <input type="text" id="searchBar" placeholder="Search Songs..." />
-</div>
+    <div id="searchContainer">
+        <input type="text" id="searchBar" placeholder="Search Songs..." />
+    </div>
 
-<div id="songList"></div>
+    <div id="songList"></div>
 
-<div id="songDetail">
-    <span id="closeDetail">×</span>
-    <h2 id="songName"></h2>
-    <img id="songImage" alt="Album Art" />
-    <button id="playPauseButton">
-        <img id="playPauseIcon" src="play.png" alt="Play/Pause" />
-    </button>
-    <audio id="audioPlayer" controls style="display: none;"></audio>
-</div>
-     <script>
-let songData = [];
-let activePlayers = {};
+    <div id="songDetail">
+        <span id="closeDetail">×</span>
+        <h2 id="songName"></h2>
+        <img id="songImage" alt="Album Art" />
+        <div id="buttonContainer">
+            <button id="resetButton">
+                <img src="reset.png" alt="Reset" width="30px" />
+            </button>
+            <button id="playPauseButton">
+                <img id="playPauseIcon" src="play.png" alt="Play/Pause" />
+            </button>
+            <button id="muteButton">
+                <img src="mute.png" alt="Mute" width="30px" />
+            </button>
+        </div>
+        <audio id="audioPlayer" controls></audio>
+    </div>
 
-fetch('songs.json')
-    .then(response => response.json())
-    .then(data => {
-        songData = data.songs;
-        displaySongs(songData);
-    })
-    .catch(error => {
-        console.error('Error fetching songs:', error);
+    <script>
+    let songData = []; // For storing filtered song titles
+
+    // Load and filter songs based on user search input
+    const searchBar = document.getElementById('searchBar');
+    searchBar.addEventListener('input', () => {
+        const query = searchBar.value.toLowerCase();
+        const filteredSongs = songData.filter(song => song.toLowerCase().includes(query));
+        displaySongs(filteredSongs);
     });
 
-const searchBar = document.getElementById('searchBar');
-searchBar.addEventListener('input', () => {
-    const query = searchBar.value.toLowerCase();
-    const filteredSongs = songData.filter(song => song.toLowerCase().includes(query));
-    displaySongs(filteredSongs);
-});
+    // Fetch the songs from the JSON file
+    fetch('songs.json')
+        .then(response => response.json())
+        .then(data => {
+            songData = data.songs; // Load songs from JSON
+            displaySongs(songData); // Initial display of all songs
+        })
+        .catch(error => {
+            console.error('Error fetching songs:', error);
+        });
 
-function displaySongs(songs) {
-    const songList = document.getElementById('songList');
-    songList.innerHTML = '';
+    // Function to display songs
+    function displaySongs(songs) {
+        const songList = document.getElementById('songList');
+        songList.innerHTML = ''; // Clear current list
 
-    songs.forEach(title => {
-        const songItem = document.createElement('div');
-        songItem.classList.add('songItem');
-        const file = `${title}.mp3`;
-        const image = `${title}.jpg`;
+        songs.forEach(title => {
+            const songItem = document.createElement('div');
+            songItem.classList.add('songItem');
+            const file = `${title}.mp3`; // Construct the file path for audio
+            const image = `${title}.jpg`; // Construct the file path for image
 
-        songItem.dataset.song = file;
-        songItem.dataset.image = image;
-        songItem.innerText = title;
+            songItem.dataset.song = file;
+            songItem.dataset.image = image;
+            songItem.innerText = title;
 
-        songItem.onclick = () => {
-            openSongDetail(title, file, image);
-        };
+            // Add event listener for opening the player UI
+            songItem.onclick = () => {
+                document.getElementById('songName').innerText = title;
+                document.getElementById('songImage').src = image;
+                document.getElementById('audioPlayer').src = file;
 
-        songList.appendChild(songItem);
-    });
-}
+                // Save the song to local storage
+                saveSongToLocalStorage(file);
 
-function openSongDetail(title, file, image) {
-    document.getElementById('songName').innerText = title;
-    const songImage = document.getElementById('songImage');
-    songImage.src = image;
+                document.getElementById('songDetail').style.display = 'block';
+            };
 
-    // Ensure songDetail is visible
-    document.getElementById('songDetail').style.display = 'block';
-
-    // Retrieve or create the audio player
-    let audioPlayer;
-    if (!activePlayers[title]) {
-        audioPlayer = new Audio(file);
-        activePlayers[title] = { player: audioPlayer, isPlaying: false };
-    } else {
-        audioPlayer = activePlayers[title].player;
+            songList.appendChild(songItem);
+        });
     }
 
-    // Get the image's position
-    const imageRect = songImage.getBoundingClientRect();
+    // Function to save MP3 file to local storage
+    function saveSongToLocalStorage(songFile) {
+        fetch(songFile)
+            .then(response => response.blob())
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                localStorage.setItem(songFile, url);
+            })
+            .catch(error => {
+                console.error('Error saving song to local storage:', error);
+            });
+    }
 
-    // Retrieve the play/pause button and icon
-    const playPauseButton = document.getElementById('playPauseButton');
-    const playPauseIcon = document.getElementById('playPauseIcon');
-
-    // Set button size and position
-    playPauseButton.style.width = '60px';  // Set width to 60px
-    playPauseButton.style.height = '60px'; // Set height to 60px
-    playPauseButton.style.position = 'absolute';
-    playPauseButton.style.top = (imageRect.bottom + 60) + 'px'; // 60px below the image
-    playPauseButton.style.left = '50%'; // Center horizontally
-    playPauseButton.style.transform = 'translateX(-50%)'; // Adjust for centering
-
-    // Update the play/pause icon based on the current state
-    updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
-
-    // Play/Pause button click event
-    playPauseButton.onclick = () => {
-        if (activePlayers[title].isPlaying) {
-            audioPlayer.pause();
-            activePlayers[title].isPlaying = false;
-        } else {
-            audioPlayer.play();
-            activePlayers[title].isPlaying = true;
-        }
-        updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
-    };
-
-    // Close the detail view without stopping the song
+    // Close the song detail player
     document.getElementById('closeDetail').onclick = () => {
         document.getElementById('songDetail').style.display = 'none';
     };
-}
 
-function updatePlayPauseIcon(icon, isPlaying) {
-    icon.src = isPlaying ? 'pause.png' : 'play.png';
-}
+    // Play/pause button functionality
+    const playPauseButton = document.getElementById('playPauseButton');
+    const playPauseIcon = document.getElementById('playPauseIcon');
+    const audioPlayer = document.getElementById('audioPlayer');
+
+    playPauseButton.onclick = () => {
+        if (audioPlayer.paused) {
+            audioPlayer.play();
+            playPauseIcon.src = 'pause.png';
+        } else {
+            audioPlayer.pause();
+            playPauseIcon.src = 'play.png';
+        }
+    };
+
+    // Reset button functionality
+    const resetButton = document.getElementById('resetButton');
+    resetButton.onclick = () => {
+        audioPlayer.currentTime = 0; // Reset to the beginning
+        audioPlayer.play();
+    };
+
+    // Mute/unmute button functionality
+    const muteButton = document.getElementById('muteButton');
+    let isMuted = false; // Track mute state
+
+    muteButton.onclick = () => {
+        if (!isMuted) {
+            audioPlayer.volume = 0; // Mute the audio
+            muteButton.innerHTML = `<img src="unmute.png" alt="Unmute" width="30px" />`;
+            isMuted = true;
+        } else {
+            audioPlayer.volume = 1; // Unmute the audio
+            muteButton.innerHTML = `<img src="mute.png" alt="Mute" width="30px" />`;
+            isMuted = false;
+        }
+    };
 </script>
+    <script type="text/javascript">
+    var audio = document.querySelector('audio'); // Select your audio element
+
+    // Notify Android app when audio is played
+    audio.addEventListener('play', function() {
+        if (typeof Android !== 'undefined' && Android.onPlay) {
+            Android.onPlay(); // Call the Android app's onPlay() method
+        }
+    });
+
+    // Notify Android app when audio is paused
+    audio.addEventListener('pause', function() {
+        if (typeof Android !== 'undefined' && Android.onPause) {
+            Android.onPause(); // Call the Android app's onPause() method
+        }
+    });
+</script>
+
     <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -258,13 +305,6 @@ function updatePlayPauseIcon(icon, isPlaying) {
     }
 </script>
 
-<script>
-    if (navigator.serviceWorker) {
-        navigator.serviceWorker.ready.then((registration) => {
-            registration.active.postMessage({ type: 'CACHE_SONGS' });
-        });
-    }
-</script>
 
 </body>
 </html>
