@@ -166,6 +166,8 @@
 
     <script>
     let songData = []; // For storing filtered song titles
+    let currentSong = null; // Track the currently playing song
+    let isPlaying = false; // Track if the current song is playing
 
     // Load and filter songs based on user search input
     const searchBar = document.getElementById('searchBar');
@@ -181,6 +183,17 @@
         .then(data => {
             songData = data.songs; // Load songs from JSON
             displaySongs(songData); // Initial display of all songs
+
+            // Restore the previously played song state if available
+            const savedSong = localStorage.getItem('currentSong');
+            const savedPlayingState = localStorage.getItem('isPlaying');
+            if (savedSong && savedPlayingState === 'true') {
+                currentSong = savedSong;
+                isPlaying = true;
+                audioPlayer.src = currentSong;
+                audioPlayer.play();
+                updatePlayPauseButton('pause');
+            }
         })
         .catch(error => {
             console.error('Error fetching songs:', error);
@@ -203,13 +216,31 @@
 
             // Add event listener for opening the player UI
             songItem.onclick = () => {
+                if (currentSong !== file) {
+                    // If a different song is clicked
+                    currentSong = file; // Update current song
+                    isPlaying = true; // Set playing state to true
+                    audioPlayer.src = file; // Set new audio source
+                    audioPlayer.play(); // Play the new song
+                    updatePlayPauseButton('pause'); // Update button to pause
+                    localStorage.setItem('currentSong', currentSong); // Save current song
+                    localStorage.setItem('isPlaying', 'true'); // Save playing state
+                } else {
+                    // If the same song is clicked
+                    if (audioPlayer.paused) {
+                        audioPlayer.play(); // Play if paused
+                        updatePlayPauseButton('pause');
+                        isPlaying = true;
+                        localStorage.setItem('isPlaying', 'true'); // Save playing state
+                    } else {
+                        audioPlayer.pause(); // Pause if playing
+                        updatePlayPauseButton('play');
+                        isPlaying = false;
+                        localStorage.setItem('isPlaying', 'false'); // Save paused state
+                    }
+                }
                 document.getElementById('songName').innerText = title;
                 document.getElementById('songImage').src = image;
-                document.getElementById('audioPlayer').src = file;
-
-                // Save the song to local storage
-                saveSongToLocalStorage(file);
-
                 document.getElementById('songDetail').style.display = 'block';
             };
 
@@ -217,36 +248,42 @@
         });
     }
 
-    // Function to save MP3 file to local storage
-    function saveSongToLocalStorage(songFile) {
-        fetch(songFile)
-            .then(response => response.blob())
-            .then(blob => {
-                const url = URL.createObjectURL(blob);
-                localStorage.setItem(songFile, url);
-            })
-            .catch(error => {
-                console.error('Error saving song to local storage:', error);
-            });
-    }
-
     // Close the song detail player
     document.getElementById('closeDetail').onclick = () => {
         document.getElementById('songDetail').style.display = 'none';
     };
 
-    // Play/pause button functionality
-    const playPauseButton = document.getElementById('playPauseButton');
-    const playPauseIcon = document.getElementById('playPauseIcon');
-    const audioPlayer = document.getElementById('audioPlayer');
-
-    playPauseButton.onclick = () => {
-        if (audioPlayer.paused) {
-            audioPlayer.play();
+    // Update play/pause button based on the current song state
+    function updatePlayPauseButton(state) {
+        if (state === 'pause') {
             playPauseIcon.src = 'pause.png';
         } else {
-            audioPlayer.pause();
             playPauseIcon.src = 'play.png';
+        }
+        // Update other song items to show play
+        const songItems = document.querySelectorAll('.songItem');
+        songItems.forEach(item => {
+            if (item.dataset.song !== currentSong) {
+                // Reset other song items to show play
+                item.dataset.playState = 'play';
+            }
+        });
+    }
+
+    // Play/pause button functionality
+    const playPauseButton = document.getElementById('playPauseButton');
+
+    playPauseButton.onclick = () => {
+        if (isPlaying) {
+            audioPlayer.pause();
+            updatePlayPauseButton('play');
+            isPlaying = false;
+            localStorage.setItem('isPlaying', 'false'); // Save paused state
+        } else {
+            audioPlayer.play();
+            updatePlayPauseButton('pause');
+            isPlaying = true;
+            localStorage.setItem('isPlaying', 'true'); // Save playing state
         }
     };
 
@@ -255,6 +292,9 @@
     resetButton.onclick = () => {
         audioPlayer.currentTime = 0; // Reset to the beginning
         audioPlayer.play();
+        updatePlayPauseButton('pause');
+        isPlaying = true;
+        localStorage.setItem('isPlaying', 'true'); // Save playing state
     };
 
     // Mute/unmute button functionality
@@ -268,11 +308,26 @@
             isMuted = true;
         } else {
             audioPlayer.volume = 1; // Unmute the audio
-            muteButton.innerHTML = `<img src="mute.png" alt="Mute" width="30px" />`;
+            muteButton.innerHTML = `<img src="mute.png" alt="Mute" />`;
             isMuted = false;
         }
     };
-</script>
+
+    // Notify Android app when audio is played
+    audioPlayer.addEventListener('play', function() {
+        if (typeof Android !== 'undefined' && Android.onPlay) {
+            Android.onPlay(); // Call the Android app's onPlay() method
+        }
+    });
+
+    // Notify Android app when audio is paused
+    audioPlayer.addEventListener('pause', function() {
+        if (typeof Android !== 'undefined' && Android.onPause) {
+            Android.onPause(); // Call the Android app's onPause() method
+        }
+    });
+    </script>
+
     <script type="text/javascript">
     var audio = document.querySelector('audio'); // Select your audio element
 
