@@ -166,79 +166,91 @@
         </div>
         <audio id="audioPlayer" controls></audio>
     </div>
+<script>
+    let songData = [];
 
-    <script>
-    let audioPlayer = document.createElement('audio');
-    let isPlaying = false;
-    let isMuted = false;
-    
+    fetch('songs.json')
+        .then(response => response.json())
+        .then(data => {
+            songData = data.songs;
+            displaySongs(songData);
+        })
+        .catch(error => {
+            console.error('Error fetching songs:', error);
+        });
+
+    const searchBar = document.getElementById('searchBar');
+    searchBar.addEventListener('input', () => {
+        const query = searchBar.value.toLowerCase();
+        const filteredSongs = songData.filter(song => song.toLowerCase().includes(query));
+        displaySongs(filteredSongs);
+    });
+
+    function displaySongs(songs) {
+        const songList = document.getElementById('songList');
+        songList.innerHTML = '';
+
+        songs.forEach(title => {
+            const songItem = document.createElement('div');
+            songItem.classList.add('songItem');
+            const file = `${title}.mp3`;
+            const image = `${title}.jpg`;
+
+            songItem.dataset.song = file;
+            songItem.dataset.image = image;
+            songItem.innerText = title;
+
+            songItem.onclick = () => {
+                document.getElementById('songName').innerText = title;
+                document.getElementById('songImage').src = image;
+                document.getElementById('audioPlayer').src = file;
+                document.getElementById('songDetail').style.display = 'block';
+            };
+
+            songList.appendChild(songItem);
+        });
+    }
+
+    document.getElementById('closeDetail').onclick = () => {
+        document.getElementById('songDetail').style.display = 'none';
+    };
+
     const playPauseButton = document.getElementById('playPauseButton');
-    const muteButton = document.getElementById('muteButton');
-    
-    
-    function showSongDetail(songName, songFile) {
-        const songDetail = document.getElementById('songDetail');
-        songDetail.style.display = 'block';
-        document.getElementById('songName').innerText = songName;
+    const playPauseIcon = document.getElementById('playPauseIcon');
+    const audioPlayer = document.getElementById('audioPlayer');
 
-        audioPlayer.src = songFile;
-        audioPlayer.play();
-        isPlaying = true;
-        updatePlayPauseIcon();
-    }
-
-    const songItems = document.getElementsByClassName('songItem');
-    for (let i = 0; i < songItems.length; i++) {
-        songItems[i].onclick = function () {
-            const songName = this.innerText;
-            const songFile = this.getAttribute('data-song');
-            showSongDetail(songName, songFile);
-        };
-    }
-
-    function hideSongDetail() {
-        const songDetail = document.getElementById('songDetail');
-        songDetail.style.display = 'none';
-        audioPlayer.pause();
-        isPlaying = false;
-        updatePlayPauseIcon();
-    }
-
-    document.getElementById('closeDetail').onclick = hideSongDetail;
-
-    muteButton.onclick = function () {
-        isMuted = !isMuted;
-        audioPlayer.muted = isMuted;
-        updateMuteButton();
-    };
-
-    function updateMuteButton() {
-        const muteIcon = document.getElementById('muteIcon');
-        muteIcon.src = isMuted ? 'unmute-icon.png' : 'mute-icon.png';
-        muteIcon.style.width = '70px';
-        muteIcon.style.height = '70px';
-    }
-
-    playPauseButton.onclick = function () {
-        if (isPlaying) {
-            audioPlayer.pause();
-        } else {
+    playPauseButton.onclick = () => {
+        if (audioPlayer.paused) {
             audioPlayer.play();
+            playPauseIcon.src = 'pause.png';
+        } else {
+            audioPlayer.pause();
+            playPauseIcon.src = 'play.png';
         }
-        isPlaying = !isPlaying;
-        updatePlayPauseIcon();
     };
 
-    function updatePlayPauseIcon() {
-        const playPauseIcon = document.getElementById('playPauseIcon');
-        playPauseIcon.src = isPlaying ? 'pause-icon.png' : 'play-icon.png';
-    }
+    const resetButton = document.getElementById('resetButton');
+    resetButton.onclick = () => {
+        audioPlayer.currentTime = 0;
+        audioPlayer.play();
+    };
 
-    audioPlayer.onended = function () {
-        isPlaying = false;
-        updatePlayPauseIcon();
+    const muteButton = document.getElementById('muteButton');
+    let isMuted = false;
+
+    muteButton.onclick = () => {
+        if (!isMuted) {
+            audioPlayer.volume = 0;
+            muteButton.innerHTML = `<img src="unmute.png" alt="Unmute" width="30px" />`;
+            isMuted = true;
+        } else {
+            audioPlayer.volume = 1;
+            muteButton.innerHTML = `<img src="mute.png" alt="Mute" width="30px" />`;
+            isMuted = false;
+        }
     };
 </script>
+   
 
     <script>
     if ('serviceWorker' in navigator) {
