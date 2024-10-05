@@ -178,112 +178,91 @@
     </div>
     <audio id="audioPlayer" controls style="display: none;"></audio>
 </div>
-    <script>
+     <script>
     let songData = [];
-let activePlayers = {};
+    let activePlayers = {};
 
-fetch('songs.json')
-    .then(response => response.json())
-    .then(data => {
-        songData = data.songs;
-        displaySongs(songData);
-    })
-    .catch(error => {
-        console.error('Error fetching songs:', error);
-    });
-
-const searchBar = document.getElementById('searchBar');
-searchBar.addEventListener('input', () => {
-    const query = searchBar.value.toLowerCase();
-    const filteredSongs = songData.filter(song => song.toLowerCase().includes(query));
-    displaySongs(filteredSongs);
-});
-
-function displaySongs(songs) {
-    const songList = document.getElementById('songList');
-    songList.innerHTML = '';
-
-    songs.forEach(title => {
-        const songItem = document.createElement('div');
-        songItem.classList.add('songItem');
-        const file = `${title}.mp3`;
-        const image = `${title}.jpg`;
-
-        songItem.dataset.song = file;
-        songItem.dataset.image = image;
-        songItem.innerText = title;
-
-        // Create the download button
-        const downloadButton = document.createElement('a');
-        downloadButton.href = file; // Set the download link
-        downloadButton.download = file; // Set the download attribute
-        downloadButton.innerHTML = '<img src="Download.png" alt="Download" style="width: 24px; height: 24px;"/>';
-
-        // Prevent the download button from triggering the songItem onclick event
-        downloadButton.addEventListener('click', (event) => {
-            event.stopPropagation(); // Prevents the parent onclick event
+    fetch('songs.json')
+        .then(response => response.json())
+        .then(data => {
+            songData = data.songs; // This will be an array of song titles
+            displaySongs(songData);
+        })
+        .catch(error => {
+            console.error('Error fetching songs:', error);
         });
 
-        // Align the download button to the right
-        downloadButton.style.marginLeft = 'auto';
-        downloadButton.style.display = 'flex';
-        downloadButton.style.alignItems = 'center';
-
-        songItem.onclick = () => {
-            openSongDetail(title, file, image);
-        };
-
-        songItem.appendChild(downloadButton); // Add the download button to the song item
-        songList.appendChild(songItem);
+    const searchBar = document.getElementById('searchBar');
+    searchBar.addEventListener('input', () => {
+        const query = searchBar.value.toLowerCase();
+        const filteredSongs = songData.filter(song => song.toLowerCase().includes(query)); // Filter song titles
+        displaySongs(filteredSongs);
     });
-}
-}
 
-function openSongDetail(title, file, image) {
-    document.getElementById('songName').innerText = title;
-    document.getElementById('songImage').src = image;
+    function displaySongs(songs) {
+        const songList = document.getElementById('songList');
+        songList.innerHTML = '';
 
-    // Create or retrieve the audio player for the song
-    let audioPlayer;
-    if (!activePlayers[title]) {
-        audioPlayer = new Audio(file);
-        audioPlayer.id = `audioPlayer_${title}`;
-        audioPlayer.controls = true;
-        audioPlayer.style.display = 'none';
-        activePlayers[title] = { player: audioPlayer, isPlaying: false };
-    } else {
-        audioPlayer = activePlayers[title].player;
+        songs.forEach(title => { // Loop through the titles directly
+            const songItem = document.createElement('div');
+            songItem.classList.add('songItem');
+            const file = `${title}.mp3`; // Assuming the mp3 files are named the same as the titles
+            const image = `${title}.jpg`; // Assuming the jpg images are named the same as the titles
+
+            songItem.dataset.song = file; // Set the dataset for the song file
+            songItem.dataset.image = image; // Set the dataset for the song image
+            songItem.innerText = title; // Set the text to the song title
+
+            songItem.onclick = () => {
+                openSongDetail(title, file, image); // Call the function to open song details
+            };
+
+            songList.appendChild(songItem); // Append the song item to the list
+        });
     }
 
-    // Show the song detail window
-    document.getElementById('songDetail').style.display = 'block';
+    function openSongDetail(title, file, image) {
+        document.getElementById('songName').innerText = title; // Display the song title
+        document.getElementById('songImage').src = image; // Display the song image
 
-    // Handle play/pause button for this song
-    const playPauseButton = document.getElementById('playPauseButton');
-    const playPauseIcon = document.getElementById('playPauseIcon');
-
-    playPauseButton.onclick = () => {
-        if (activePlayers[title].isPlaying) {
-            audioPlayer.pause();
-            activePlayers[title].isPlaying = false;
+        // Create or retrieve the audio player for the song
+        let audioPlayer;
+        if (!activePlayers[title]) {
+            audioPlayer = new Audio(file); // Create a new audio player
+            audioPlayer.style.display = 'none'; // Hide the player
+            activePlayers[title] = { player: audioPlayer, isPlaying: false }; // Store the player
         } else {
-            audioPlayer.play();
-            activePlayers[title].isPlaying = true;
+            audioPlayer = activePlayers[title].player; // Retrieve the existing player
         }
-        updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
-    };
 
-    // Close the detail view without stopping the song
-    document.getElementById('closeDetail').onclick = () => {
-        document.getElementById('songDetail').style.display = 'none';
-        // Keep the song playing in the background if it is still playing
-    };
-}
+        // Show the song detail window
+        document.getElementById('songDetail').style.display = 'block';
 
-function updatePlayPauseIcon(icon, isPlaying) {
-    icon.src = isPlaying ? 'pause.png' : 'play.png';
-}
-            </script>
+        // Handle play/pause button for this song
+        const playPauseButton = document.getElementById('playPauseButton');
+        const playPauseIcon = document.getElementById('playPauseIcon');
+
+        playPauseButton.onclick = () => {
+            if (activePlayers[title].isPlaying) {
+                audioPlayer.pause(); // Pause if currently playing
+                activePlayers[title].isPlaying = false;
+            } else {
+                audioPlayer.play(); // Play if currently paused
+                activePlayers[title].isPlaying = true;
+            }
+            updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying); // Update icon
+        };
+
+        // Close the detail view without stopping the song
+        document.getElementById('closeDetail').onclick = () => {
+            document.getElementById('songDetail').style.display = 'none'; // Hide the detail view
+        };
+    }
+
+    function updatePlayPauseIcon(icon, isPlaying) {
+        icon.src = isPlaying ? 'pause.png' : 'play.png'; // Update icon based on playing state
+    }
+</script>
 <script>
     if (navigator.serviceWorker) {
         navigator.serviceWorker.ready.then((registration) => {
