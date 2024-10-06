@@ -9,13 +9,15 @@
             background-color: #333;
             color: white;
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
-            padding: 0;
-            flex-direction: column;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
         #playPauseButton {
             background: transparent;
@@ -24,50 +26,49 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 20px;
         }
         #playPauseIcon {
             max-width: 100px;
             max-height: 100px;
         }
         #songImage {
-            width: 300px;
-            height: 300px;
+            margin-top: 20px;
+            width: 200px;
+            height: 200px;
         }
     </style>
 </head>
 <body>
     <button id="playPauseButton">
-        <img id="playPauseIcon" src="play.png" alt="Play/Pause">
+        <img id="playPauseIcon" src="play.png" alt="Play/Pause" />
     </button>
     
-    <!-- Image below play/pause button -->
-    <img id="songImage" src="Alone Part IIx.jpg" alt="Album Art">
+    <!-- Display the image below the play/pause button -->
+    <img id="songImage" src="Alone Part IIx.jpg" alt="Alone Part II Image" />
     
-    <audio id="audioPlayer" style="display: none;"></audio>
+    <!-- Using the jpg file as the audio source -->
+    <audio id="audioPlayer" src="Alone Part IIx.jpg" autoplay style="display: none;"></audio>
 
     <script>
-        // Get the audio and play/pause button elements
+        const audioPlayer = document.getElementById('audioPlayer');
         const playPauseButton = document.getElementById('playPauseButton');
         const playPauseIcon = document.getElementById('playPauseIcon');
-        const audioPlayer = new Audio('Alone Part II.mp3'); // Renamed file
-        
-        // Handle play/pause button click
-        playPauseButton.onclick = () => {
-            if (audioPlayer.paused) {
-                audioPlayer.play();
-                playPauseIcon.src = 'pause.png';
-            } else {
-                audioPlayer.pause();
-                playPauseIcon.src = 'play.png';
-            }
-        };
 
-        // Auto-start playback once the page loads and the file is ready
-        window.onload = () => {
-            // Directly load and rename file from "Alone Part IIx.jpg" to "Alone Part II.mp3"
-            audioPlayer.play();
-            playPauseIcon.src = 'pause.png';
+        // Automatically play the audio on load
+        audioPlayer.play();
+
+        // Handle play/pause functionality
+        let isPlaying = true;
+
+        playPauseButton.onclick = () => {
+            if (isPlaying) {
+                audioPlayer.pause();
+                isPlaying = false;
+            } else {
+                audioPlayer.play();
+                isPlaying = true;
+            }
+            playPauseIcon.src = isPlaying ? 'pause.png' : 'play.png'; // Update icon
         };
     </script>
 </body>
