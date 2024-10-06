@@ -327,43 +327,51 @@
     }
 </script>
     <script>
-const cacheName = 'my-site-cache-v1';
+    const cacheName = 'my-site-cache-v2';
+    const filesToCache = [
+        '/repository/',
+        '/repository/index.html',
+        '/repository/style.css',
+        '/repository/play.png',
+        '/repository/pause.png',
+        '/repository/songs.json',
+    ];
 
-// Cache all elements when the page loads
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js').then(registration => {
-            console.log('Service Worker registered with scope:', registration.scope);
-        }).catch(error => {
-            console.error('Service Worker registration failed:', error);
-        });
-    });
-}
-
-self.addEventListener('install', event => {
-    event.waitUntil(
-        caches.open(cacheName).then(cache => {
-            return cache.addAll([
-                // Include the HTML file to ensure it's available offline
-                'index.html',
-                // Other resources can be dynamically cached
-            ]);
-        })
-    );
-});
-
-self.addEventListener('fetch', event => {
-    event.respondWith(
-        caches.match(event.request).then(response => {
-            return response || fetch(event.request).then(response => {
-                return caches.open(cacheName).then(cache => {
-                    cache.put(event.request, response.clone());
-                    return response;
-                });
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/repository/service-worker.js').then(registration => {
+                console.log('Service Worker registered with scope:', registration.scope);
+            }).catch(error => {
+                console.error('Service Worker registration failed:', error);
             });
-        })
-    );
-});
+        });
+    }
+
+    self.addEventListener('install', event => {
+        event.waitUntil(
+            caches.open(cacheName).then(cache => {
+                return cache.addAll(filesToCache);
+            })
+        );
+    });
+
+    self.addEventListener('fetch', event => {
+        event.respondWith(
+            caches.match(event.request).then(response => {
+                if (response) {
+                    return response;
+                }
+                return fetch(event.request).then(networkResponse => {
+                    return caches.open(cacheName).then(cache => {
+                        cache.put(event.request, networkResponse.clone());
+                        return networkResponse;
+                    });
+                });
+            }).catch(() => {
+                return caches.match('/repository/offline.html');
+            })
+        );
+    });
 </script>
 </body>
 </html>
