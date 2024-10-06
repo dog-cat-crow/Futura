@@ -408,28 +408,33 @@
             console.error("Audio error:", e);
         };
 
-        // Optional: You can save to a temporary cache if needed
-        // Implement caching logic here if using Service Workers
-        
+        // Store the player in activePlayers
+        activePlayers[songTitle] = { player: audioPlayer, isPlaying: false };
+
         return audioPlayer;
     }
+
+    // Function to preload audio files on page load
+    function preloadAudioFiles() {
+        loadAndCacheAudioFile("Alone Part II");
+        loadAndCacheAudioFile("Animals");
+        loadAndCacheAudioFile("Fly Away");
+    }
+
+    // Call the preload function when the DOM is fully loaded
+    document.addEventListener("DOMContentLoaded", preloadAudioFiles);
 
     // Adjust the existing openSongDetail function to integrate the caching
     function openSongDetail(title, file, image) {
         document.getElementById('songName').innerText = title;
         document.getElementById('songImage').src = image;
 
-        // Call the caching function for specific songs
-        let audioPlayer;
-        if (["Alone Part II", "Animals", "Fly Away"].includes(title)) {
-            audioPlayer = loadAndCacheAudioFile(title);
-            if (audioPlayer) {
-                activePlayers[title] = { player: audioPlayer, isPlaying: false };
-            }
-        } else {
-            // Default behavior for other songs
-            let audioSource = file.replace('.jpg', '.mp3');
-            audioPlayer = new Audio(audioSource);
+        // Check if the player is already active
+        let audioPlayer = activePlayers[title]?.player;
+
+        if (!audioPlayer) {
+            // Load it normally for other songs
+            audioPlayer = new Audio(file.replace('.jpg', '.mp3'));
             activePlayers[title] = { player: audioPlayer, isPlaying: false };
         }
 
