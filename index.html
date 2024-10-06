@@ -327,18 +327,6 @@
     }
 </script>
     <script>
-    const cacheName = 'my-site-cache-v3';
-    const filesToCache = [
-        './',
-        'index.html',
-        'play.png',
-        'pause.png',
-        'songs.json',
-        'Alone Part II.mp3',
-        'Animals.mp3',
-        'Fly Away.mp3',
-    ];
-
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('service-worker.js').then(registration => {
@@ -348,32 +336,6 @@
             });
         });
     }
-
-    self.addEventListener('install', event => {
-        event.waitUntil(
-            caches.open(cacheName).then(cache => {
-                return cache.addAll(filesToCache);
-            })
-        );
-    });
-
-    self.addEventListener('fetch', event => {
-        event.respondWith(
-            caches.match(event.request).then(response => {
-                if (response) {
-                    return response;
-                }
-                return fetch(event.request).then(networkResponse => {
-                    return caches.open(cacheName).then(cache => {
-                        cache.put(event.request, networkResponse.clone());
-                        return networkResponse;
-                    });
-                }).catch(() => {
-                    return caches.match('index.html');
-                });
-            })
-        );
-    });
 </script>
 </body>
 </html>
