@@ -329,11 +329,11 @@
     <script>
     const cacheName = 'my-site-cache-v2';
     const filesToCache = [
-        'index.html',
-        'style.css',             // Add any CSS files you want to cache
-        'play.png',              // Cache play icon
-        'pause.png',             // Cache pause icon
-        'songs.json',            // Cache song data
+        './',                   // Cache the root to ensure index.html is served
+        'index.html',          // Cache main HTML
+        'play.png',            // Cache play icon
+        'pause.png',           // Cache pause icon
+        'songs.json',          // Cache song data
         // Add more assets here as needed
     ];
 
@@ -366,9 +366,9 @@
                         cache.put(event.request, networkResponse.clone());
                         return networkResponse;
                     });
+                }).catch(() => {
+                    return caches.match('index.html'); // Fallback to index.html if offline
                 });
-            }).catch(() => {
-                return caches.match('index.html'); // Fallback to index.html if offline
             })
         );
     });
