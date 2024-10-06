@@ -215,12 +215,12 @@
         songs.forEach(song => {
             const songItem = document.createElement('div');
             songItem.classList.add('songItem');
-            songItem.dataset.song = song.mp3.replace('.jpg', '.mp3'); // Change extension to .mp3
+            songItem.dataset.song = song.mp3;
             songItem.dataset.image = song.jpg;
             songItem.innerText = song.title;
 
             songItem.onclick = () => {
-                openSongDetail(song.title, songItem.dataset.song, songItem.dataset.image);
+                openSongDetail(song.title, song.mp3, song.jpg);
             };
 
             songList.appendChild(songItem);
@@ -231,11 +231,19 @@
         document.getElementById('songName').innerText = title;
         document.getElementById('songImage').src = image;
 
+        // Change .jpg to .mp3 for audio source
+        let audioSource = file.replace('.jpg', '.mp3'); // Adjusted to reference .mp3
+        console.log("Audio source:", audioSource); // Log the audio source for debugging
+
         let audioPlayer;
         if (!activePlayers[title]) {
-            audioPlayer = new Audio(file);
-            audioPlayer.style.display = 'none';
+            audioPlayer = new Audio(audioSource); // Use the correct audio source
             activePlayers[title] = { player: audioPlayer, isPlaying: false };
+
+            // Error handling for audio playback
+            audioPlayer.onerror = (e) => {
+                console.error("Audio error:", e);
+            };
         } else {
             audioPlayer = activePlayers[title].player;
         }
@@ -278,6 +286,24 @@
 
     function updatePlayPauseIcon(icon, isPlaying) {
         icon.src = isPlaying ? 'pause.png' : 'play.png';
+    }
+
+    // Caching for offline usage
+    if (navigator.serviceWorker) {
+        navigator.serviceWorker.ready.then((registration) => {
+            registration.active.postMessage({ type: 'CACHE_SONGS' });
+        });
+    }
+
+    // Service Worker registration
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('service-worker.js').then(registration => {
+                console.log('Service Worker registered with scope:', registration.scope);
+            }).catch(error => {
+                console.error('Service Worker registration failed:', error);
+            });
+        });
     }
 </script>
 <script>
