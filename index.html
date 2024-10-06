@@ -327,14 +327,16 @@
     }
 </script>
     <script>
-    const cacheName = 'my-site-cache-v2';
+    const cacheName = 'my-site-cache-v3';
     const filesToCache = [
-        './',                   // Cache the root to ensure index.html is served
-        'index.html',          // Cache main HTML
-        'play.png',            // Cache play icon
-        'pause.png',           // Cache pause icon
-        'songs.json',          // Cache song data
-        // Add more assets here as needed
+        './',
+        'index.html',
+        'play.png',
+        'pause.png',
+        'songs.json',
+        'Alone Part II.mp3',
+        'Animals.mp3',
+        'Fly Away.mp3',
     ];
 
     if ('serviceWorker' in navigator) {
@@ -367,7 +369,7 @@
                         return networkResponse;
                     });
                 }).catch(() => {
-                    return caches.match('index.html'); // Fallback to index.html if offline
+                    return caches.match('index.html');
                 });
             })
         );
