@@ -329,17 +329,17 @@
     <script>
     const cacheName = 'my-site-cache-v2';
     const filesToCache = [
-        '/repository/',
-        '/repository/index.html',
-        '/repository/style.css',
-        '/repository/play.png',
-        '/repository/pause.png',
-        '/repository/songs.json',
+        'index.html',
+        'style.css',             // Add any CSS files you want to cache
+        'play.png',              // Cache play icon
+        'pause.png',             // Cache pause icon
+        'songs.json',            // Cache song data
+        // Add more assets here as needed
     ];
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/repository/service-worker.js').then(registration => {
+            navigator.serviceWorker.register('service-worker.js').then(registration => {
                 console.log('Service Worker registered with scope:', registration.scope);
             }).catch(error => {
                 console.error('Service Worker registration failed:', error);
@@ -368,7 +368,7 @@
                     });
                 });
             }).catch(() => {
-                return caches.match('/repository/offline.html');
+                return caches.match('index.html'); // Fallback to index.html if offline
             })
         );
     });
