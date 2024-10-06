@@ -20,7 +20,7 @@
             -webkit-tap-highlight-color: transparent;
         }
         .songContainer {
-            margin: 20px 0; /* Space between songs */
+            margin: 10px 0; /* Space between songs */
             text-align: center; /* Center align text */
         }
         #playPauseButton {
@@ -32,8 +32,14 @@
             justify-content: center;
         }
         #playPauseIcon {
-            max-width: 100px;
-            max-height: 100px;
+            max-width: 50px; /* Smaller icon size */
+            max-height: 50px; /* Smaller icon size */
+        }
+        img {
+            width: 100px; /* Fixed width for images */
+            height: 100px; /* Fixed height for images */
+            display: block; /* Ensures images stack vertically */
+            margin: 0 auto; /* Center images horizontally */
         }
     </style>
 </head>
@@ -43,7 +49,7 @@
             <img id="playPauseIcon1" src="play.png" alt="Play/Pause" />
         </button>
         <audio id="audioPlayer1" src="Alone Part IIx.jpg" autoplay style="display: none;"></audio>
-        <img src="Alone Part IIx.jpg" alt="Alone Part II" style="max-width: 200px;"/>
+        <img src="Alone Part IIx.jpg" alt="Alone Part II" />
     </div>
 
     <div class="songContainer" id="song2">
@@ -51,7 +57,7 @@
             <img id="playPauseIcon2" src="play.png" alt="Play/Pause" />
         </button>
         <audio id="audioPlayer2" src="Animalsx.jpg" autoplay style="display: none;"></audio>
-        <img src="Animalsx.jpg" alt="Animals" style="max-width: 200px;"/>
+        <img src="Animalsx.jpg" alt="Animals" />
     </div>
 
     <div class="songContainer" id="song3">
@@ -59,7 +65,7 @@
             <img id="playPauseIcon3" src="play.png" alt="Play/Pause" />
         </button>
         <audio id="audioPlayer3" src="Fly Awayx.jpg" autoplay style="display: none;"></audio>
-        <img src="Fly Awayx.jpg" alt="Fly Away" style="max-width: 200px;"/>
+        <img src="Fly Awayx.jpg" alt="Fly Away" />
     </div>
 
     <script>
