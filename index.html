@@ -12,12 +12,16 @@
             margin: 0;
             padding: 0;
             display: flex;
-            flex-direction: column;
+            flex-direction: column; /* Stack elements vertically */
             justify-content: center;
             align-items: center;
             height: 100vh;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
+        }
+        .songContainer {
+            margin: 20px 0; /* Space between songs */
+            text-align: center; /* Center align text */
         }
         #playPauseButton {
             background: transparent;
@@ -31,45 +35,61 @@
             max-width: 100px;
             max-height: 100px;
         }
-        #songImage {
-            margin-top: 20px;
-            width: 200px;
-            height: 200px;
-        }
     </style>
 </head>
 <body>
-    <button id="playPauseButton">
-        <img id="playPauseIcon" src="play.png" alt="Play/Pause" />
-    </button>
-    
-    <!-- Display the image below the play/pause button -->
-    <img id="songImage" src="Alone Part IIx.jpg" alt="Alone Part II Image" />
-    
-    <!-- Using the jpg file as the audio source -->
-    <audio id="audioPlayer" src="Alone Part IIx.jpg" autoplay style="display: none;"></audio>
+    <div class="songContainer" id="song1">
+        <button id="playPauseButton1">
+            <img id="playPauseIcon1" src="play.png" alt="Play/Pause" />
+        </button>
+        <audio id="audioPlayer1" src="Alone Part IIx.jpg" autoplay style="display: none;"></audio>
+        <img src="Alone Part IIx.jpg" alt="Alone Part II" style="max-width: 200px;"/>
+    </div>
+
+    <div class="songContainer" id="song2">
+        <button id="playPauseButton2">
+            <img id="playPauseIcon2" src="play.png" alt="Play/Pause" />
+        </button>
+        <audio id="audioPlayer2" src="Animalsx.jpg" autoplay style="display: none;"></audio>
+        <img src="Animalsx.jpg" alt="Animals" style="max-width: 200px;"/>
+    </div>
+
+    <div class="songContainer" id="song3">
+        <button id="playPauseButton3">
+            <img id="playPauseIcon3" src="play.png" alt="Play/Pause" />
+        </button>
+        <audio id="audioPlayer3" src="Fly Awayx.jpg" autoplay style="display: none;"></audio>
+        <img src="Fly Awayx.jpg" alt="Fly Away" style="max-width: 200px;"/>
+    </div>
 
     <script>
-        const audioPlayer = document.getElementById('audioPlayer');
-        const playPauseButton = document.getElementById('playPauseButton');
-        const playPauseIcon = document.getElementById('playPauseIcon');
+        // Function to handle play/pause functionality for a specific song
+        function setupSongControls(audioPlayerId, playPauseButtonId, playPauseIconId) {
+            const audioPlayer = document.getElementById(audioPlayerId);
+            const playPauseButton = document.getElementById(playPauseButtonId);
+            const playPauseIcon = document.getElementById(playPauseIconId);
+            let isPlaying = true;
 
-        // Automatically play the audio on load
-        audioPlayer.play();
+            // Automatically play the audio on load
+            audioPlayer.play();
 
-        // Handle play/pause functionality
-        let isPlaying = true;
+            // Handle play/pause functionality
+            playPauseButton.onclick = () => {
+                if (isPlaying) {
+                    audioPlayer.pause();
+                    isPlaying = false;
+                } else {
+                    audioPlayer.play();
+                    isPlaying = true;
+                }
+                playPauseIcon.src = isPlaying ? 'pause.png' : 'play.png'; // Update icon
+            };
+        }
 
-        playPauseButton.onclick = () => {
-            if (isPlaying) {
-                audioPlayer.pause();
-                isPlaying = false;
-            } else {
-                audioPlayer.play();
-                isPlaying = true;
-            }
-            playPauseIcon.src = isPlaying ? 'pause.png' : 'play.png'; // Update icon
-        };
+        // Setup controls for each song
+        setupSongControls('audioPlayer1', 'playPauseButton1', 'playPauseIcon1');
+        setupSongControls('audioPlayer2', 'playPauseButton2', 'playPauseIcon2');
+        setupSongControls('audioPlayer3', 'playPauseButton3', 'playPauseIcon3');
     </script>
 </body>
 </html>
