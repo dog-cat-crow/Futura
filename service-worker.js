@@ -1,4 +1,4 @@
-const cacheName = 'my-site-cache-v4';
+const cacheName = 'my-site-cache-v5';
 const filesToCache = [
     './',
     'index.html',
@@ -36,16 +36,6 @@ const filesToCache = [
     'Levitating.jpg',
 ];
 
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js').then(registration => {
-            console.log('Service Worker registered with scope:', registration.scope);
-        }).catch(error => {
-            console.error('Service Worker registration failed:', error);
-        });
-    });
-}
-
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(cacheName).then(cache => {
@@ -57,16 +47,15 @@ self.addEventListener('install', event => {
 self.addEventListener('fetch', event => {
     event.respondWith(
         caches.match(event.request).then(response => {
-            if (response) {
-                return response;
-            }
-            return fetch(event.request).then(networkResponse => {
+            return response || fetch(event.request).then(response => {
                 return caches.open(cacheName).then(cache => {
-                    cache.put(event.request, networkResponse.clone());
-                    return networkResponse;
+                    // Cache only the requests that are not already in cache
+                    if (!response || response.status !== 200 || response.type !== 'basic') {
+                        return response;
+                    }
+                    cache.put(event.request, response.clone());
+                    return response;
                 });
-            }).catch(() => {
-                return caches.match('index.html');
             });
         })
     );
