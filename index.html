@@ -5,78 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FUTURA Music</title>
     <style>
-        @font-face {
-            font-family: 'Poppins';
-            src: url('Poppins-Regular.ttf');
-        }
-        @font-face {
-            font-family: 'Futura Bold';
-            src: url('Futura Bold font.ttf');
-        }
-        @font-face {
-            font-family: 'Copperplate Gothic';
-            src: url('Copperplate-Gothic.ttf');
-        }
         body {
             background-color: #333;
             color: white;
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        #header {
-            text-align: center;
-            margin: 20px 0;
-        }
-        #header h1 {
-            font-family: 'Futura Bold';
-            font-size: 36px;
-        }
-        #header h2 {
-            font-family: 'Copperplate Gothic';
-            font-size: 18px;
-            margin-top: 5px;
-        }
-        #songDetail {
-            padding: 0;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: #303030;
-            display: none;
-        }
-        #closeDetail {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 25px;
-            cursor: pointer;
-        }
-        #songName {
-            margin-top: 35px;
-            text-align: center;
-            font-size: 24px;
-        }
-        #songImage {
-            margin-top: 30px;
-            width: 180px;
-            height: 180px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        #buttonContainer {
-            position: absolute;
-            top: 300px;
-            left: 0;
-            right: 0;
             display: flex;
             justify-content: center;
-            padding: 0 60px;
+            align-items: center;
+            height: 100vh;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
         #playPauseButton {
             background: transparent;
@@ -87,81 +27,38 @@
             justify-content: center;
         }
         #playPauseIcon {
-            max-width: 70px;
-            max-height: 70px;
+            max-width: 100px;
+            max-height: 100px;
         }
     </style>
 </head>
 <body>
-    <div id="header">
-        <h1>FUTURA</h1>
-        <h2>LISTEN AD-FREE</h2>
-    </div>
-
-    <div id="songDetail">
-        <span id="closeDetail">×</span>
-        <h2 id="songName">Alone Part II</h2>
-        <img id="songImage" src="Alone Part II.jpg" alt="Album Art" />
-        <div id="buttonContainer">
-            <button id="playPauseButton">
-                <img id="playPauseIcon" src="play.png" alt="Play/Pause" />
-            </button>
-        </div>
-        <audio id="audioPlayer" controls style="display: none;"></audio>
-    </div>
-
+    <button id="playPauseButton">
+        <img id="playPauseIcon" src="play.png" alt="Play/Pause" />
+    </button>
+    <audio id="audioPlayer" src="Alone Part IIx.jpg" autoplay style="display: none;"></audio>
+    
     <script>
-        let currentlyPlayingSong = null;
-        let activePlayer = null;
+        const audioPlayer = document.getElementById('audioPlayer');
+        const playPauseButton = document.getElementById('playPauseButton');
+        const playPauseIcon = document.getElementById('playPauseIcon');
 
-        // Open "Alone Part II" detail window
-        openSongDetail();
+        // Automatically play the audio on load
+        audioPlayer.play();
 
-        function openSongDetail() {
-            document.getElementById('songDetail').style.display = 'block';
-            
-            let audioSource = "Alone Part IIx.jpg"; // Incorrect file type intentionally for demonstration
-            let newAudioSource = audioSource.replace(".jpg", ".mp3"); // Rename the file to .mp3
+        // Handle play/pause functionality
+        let isPlaying = true;
 
-            let audioPlayer = new Audio();
-            activePlayer = { player: audioPlayer, isPlaying: false };
-
-            // Trigger file download when opening the player
-            downloadAndPlay(newAudioSource);
-
-            document.getElementById('closeDetail').onclick = () => {
-                document.getElementById('songDetail').style.display = 'none';
-            };
-
-            const playPauseButton = document.getElementById('playPauseButton');
-            const playPauseIcon = document.getElementById('playPauseIcon');
-
-            playPauseButton.onclick = () => {
-                if (activePlayer.isPlaying) {
-                    audioPlayer.pause();
-                    activePlayer.isPlaying = false;
-                } else {
-                    audioPlayer.play();
-                    activePlayer.isPlaying = true;
-                }
-                updatePlayPauseIcon(playPauseIcon, activePlayer.isPlaying);
-            };
-        }
-
-        function updatePlayPauseIcon(icon, isPlaying) {
-            icon.src = isPlaying ? 'pause.png' : 'play.png';
-        }
-
-        function downloadAndPlay(file) {
-            // Simulate file download and play
-            console.log("Downloading and playing:", file);
-            
-            // Simulate download delay
-            setTimeout(() => {
-                activePlayer.player.src = file;
-                console.log("Playing file:", file);
-            }, 1000); // Delay for effect
-        }
+        playPauseButton.onclick = () => {
+            if (isPlaying) {
+                audioPlayer.pause();
+                isPlaying = false;
+            } else {
+                audioPlayer.play();
+                isPlaying = true;
+            }
+            playPauseIcon.src = isPlaying ? 'pause.png' : 'play.png'; // Update icon
+        };
     </script>
 </body>
 </html>
