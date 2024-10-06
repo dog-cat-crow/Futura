@@ -9,14 +9,13 @@
             background-color: #333;
             color: white;
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
+            flex-direction: column;
         }
         #playPauseButton {
             background: transparent;
@@ -25,51 +24,51 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-bottom: 20px;
         }
         #playPauseIcon {
             max-width: 100px;
             max-height: 100px;
         }
+        #songImage {
+            width: 300px;
+            height: 300px;
+        }
     </style>
 </head>
 <body>
     <button id="playPauseButton">
-        <img id="playPauseIcon" src="play.png" alt="Play/Pause" />
+        <img id="playPauseIcon" src="play.png" alt="Play/Pause">
     </button>
-    <audio id="audioPlayer" src="Alone Part IIx.jpg" autoplay style="display: none;"></audio>
     
+    <!-- Image below play/pause button -->
+    <img id="songImage" src="Alone Part IIx.jpg" alt="Album Art">
+    
+    <audio id="audioPlayer" style="display: none;"></audio>
+
     <script>
-        const audioPlayer = document.getElementById('audioPlayer');
+        // Get the audio and play/pause button elements
         const playPauseButton = document.getElementById('playPauseButton');
         const playPauseIcon = document.getElementById('playPauseIcon');
-
-        // Automatically play the audio on load
-        audioPlayer.play();
-
-        // Handle play/pause functionality
-        let isPlaying = true;
-
+        const audioPlayer = new Audio('Alone Part II.mp3'); // Renamed file
+        
+        // Handle play/pause button click
         playPauseButton.onclick = () => {
-            if (isPlaying) {
-                audioPlayer.pause();
-                isPlaying = false;
-            } else {
+            if (audioPlayer.paused) {
                 audioPlayer.play();
-                isPlaying = true;
+                playPauseIcon.src = 'pause.png';
+            } else {
+                audioPlayer.pause();
+                playPauseIcon.src = 'play.png';
             }
-            playPauseIcon.src = isPlaying ? 'pause.png' : 'play.png'; // Update icon
         };
 
-        // Service Worker registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('service-worker.js').then(registration => {
-                    console.log('Service Worker registered with scope:', registration.scope);
-                }).catch(error => {
-                    console.error('Service Worker registration failed:', error);
-                });
-            });
-        }
+        // Auto-start playback once the page loads and the file is ready
+        window.onload = () => {
+            // Directly load and rename file from "Alone Part IIx.jpg" to "Alone Part II.mp3"
+            audioPlayer.play();
+            playPauseIcon.src = 'pause.png';
+        };
     </script>
 </body>
 </html>
