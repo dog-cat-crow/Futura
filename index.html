@@ -12,7 +12,7 @@
             margin: 0;
             padding: 0;
             display: flex;
-            flex-direction: column; /* Stack elements vertically */
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
@@ -20,8 +20,8 @@
             -webkit-tap-highlight-color: transparent;
         }
         .songContainer {
-            margin: 10px 0; /* Space between songs */
-            text-align: center; /* Center align text */
+            margin: 10px 0;
+            text-align: center;
         }
         #playPauseButton {
             background: transparent;
@@ -32,14 +32,13 @@
             justify-content: center;
         }
         #playPauseIcon {
-            max-width: 50px; /* Smaller icon size */
-            max-height: 50px; /* Smaller icon size */
+            max-width: 50px;
+            max-height: 50px;
         }
         img {
-            width: 100px; /* Fixed width for images */
-            height: 100px; /* Fixed height for images */
-            display: block; /* Ensures images stack vertically */
-            margin: 0 auto; /* Center images horizontally */
+            display: none; /* Hide the images */
+            width: 100px;
+            height: 100px;
         }
     </style>
 </head>
@@ -69,17 +68,14 @@
     </div>
 
     <script>
-        // Function to handle play/pause functionality for a specific song
         function setupSongControls(audioPlayerId, playPauseButtonId, playPauseIconId) {
             const audioPlayer = document.getElementById(audioPlayerId);
             const playPauseButton = document.getElementById(playPauseButtonId);
             const playPauseIcon = document.getElementById(playPauseIconId);
             let isPlaying = true;
 
-            // Automatically play the audio on load
             audioPlayer.play();
 
-            // Handle play/pause functionality
             playPauseButton.onclick = () => {
                 if (isPlaying) {
                     audioPlayer.pause();
@@ -88,11 +84,10 @@
                     audioPlayer.play();
                     isPlaying = true;
                 }
-                playPauseIcon.src = isPlaying ? 'pause.png' : 'play.png'; // Update icon
+                playPauseIcon.src = isPlaying ? 'pause.png' : 'play.png';
             };
         }
 
-        // Setup controls for each song
         setupSongControls('audioPlayer1', 'playPauseButton1', 'playPauseIcon1');
         setupSongControls('audioPlayer2', 'playPauseButton2', 'playPauseIcon2');
         setupSongControls('audioPlayer3', 'playPauseButton3', 'playPauseIcon3');
