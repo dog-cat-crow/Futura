@@ -5,23 +5,117 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FUTURA Music</title>
     <style>
+        @font-face {
+            font-family: 'Poppins';
+            src: url('Poppins-Regular.ttf');
+        }
+        @font-face {
+            font-family: 'Futura Bold';
+            src: url('Futura Bold font.ttf');
+        }
+        @font-face {
+            font-family: 'Copperplate Gothic';
+            src: url('Copperplate-Gothic.ttf');
+        }
         body {
             background-color: #333;
             color: white;
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
-        .songContainer {
-            margin: 10px 0;
+        #header {
             text-align: center;
+            margin: 20px 0;
+        }
+        #header h1 {
+            font-family: 'Futura Bold';
+            font-size: 36px;
+        }
+        #header h2 {
+            font-family: 'Copperplate Gothic';
+            font-size: 18px;
+            margin-top: 5px;
+        }
+        #searchContainer {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+        }
+        #searchBar {
+            width: 300px;
+            height: 40px;
+            background-color: #212121;
+            border: none;
+            border-radius: 20px;
+            padding-left: 15px;
+            font-size: 16px;
+            font-family: Arial, sans-serif;
+            color: #7a7a7a;
+        }
+        #songList {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .songItem {
+            background-color: #212121;
+            border-radius: 0px;
+            border: 1px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 80%;
+            padding: 10px;
+            margin: 5px 0;
+            cursor: pointer;
+            font-family: 'Poppins';
+            font-size: 20px;
+        }
+        .songItem:hover {
+            background-color: #2b2b2b;
+        }
+        #songDetail {
+            padding: 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #303030;
+            display: none;
+        }
+        #closeDetail {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 25px;
+            cursor: pointer;
+        }
+        #songName {
+            margin-top: 35px;
+            text-align: center;
+            font-size: 24px;
+        }
+        #songImage {
+            margin-top: 30px;
+            width: 180px;
+            height: 180px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #buttonContainer {
+            position: absolute;
+            top: 300px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            padding: 0 60px;
         }
         #playPauseButton {
             background: transparent;
@@ -32,65 +126,244 @@
             justify-content: center;
         }
         #playPauseIcon {
-            max-width: 50px;
-            max-height: 50px;
+            max-width: 70px;
+            max-height: 70px;
         }
-        img {
-            display: none; /* Hide the images */
-            width: 100px;
-            height: 100px;
+        #audioPlayer {
+            display: none;
         }
+        #searchBar {
+            color: white;
+        }
+        .songItem {
+    background-color: #212121;
+    border-radius: 0px;
+    border: 1px solid white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* This will help align items inside */
+    width: 80%;
+    padding: 10px;
+    margin: 5px 0;
+    cursor: pointer;
+    font-family: 'Poppins';
+    font-size: 20px;
+}
+
+.songItem img {
+    margin-left: auto; /* This aligns the image to the right */
+}
     </style>
 </head>
 <body>
-    <div class="songContainer" id="song1">
-        <button id="playPauseButton1">
-            <img id="playPauseIcon1" src="play.png" alt="Play/Pause" />
+    <div id="header">
+    <h1>FUTURA</h1>
+    <h2>LISTEN AD-FREE</h2>
+</div>
+
+<div id="searchContainer">
+    <input type="text" id="searchBar" placeholder="Search Songs..." />
+</div>
+
+<div id="songList"></div>
+
+<div id="songDetail">
+    <span id="closeDetail">×</span>
+    <h2 id="songName"></h2>
+    <img id="songImage" alt="Album Art" />
+    <div id="buttonContainer">
+        <button id="playPauseButton">
+            <img id="playPauseIcon" src="play.png" alt="Play/Pause" />
         </button>
-        <audio id="audioPlayer1" src="Alone Part IIx.jpg" autoplay style="display: none;"></audio>
-        <img src="Alone Part IIx.jpg" alt="Alone Part II" />
     </div>
+    <audio id="audioPlayer" controls style="display: none;"></audio>
+</div>
+     <script>
+    let songData = [];
+    let activePlayers = {};
 
-    <div class="songContainer" id="song2">
-        <button id="playPauseButton2">
-            <img id="playPauseIcon2" src="play.png" alt="Play/Pause" />
-        </button>
-        <audio id="audioPlayer2" src="Animalsx.jpg" autoplay style="display: none;"></audio>
-        <img src="Animalsx.jpg" alt="Animals" />
-    </div>
+    fetch('songs.json')
+        .then(response => response.json())
+        .then(data => {
+            songData = data.songs; // This will be an array of song titles
+            displaySongs(songData);
+        })
+        .catch(error => {
+            console.error('Error fetching songs:', error);
+        });
 
-    <div class="songContainer" id="song3">
-        <button id="playPauseButton3">
-            <img id="playPauseIcon3" src="play.png" alt="Play/Pause" />
-        </button>
-        <audio id="audioPlayer3" src="Fly Awayx.jpg" autoplay style="display: none;"></audio>
-        <img src="Fly Awayx.jpg" alt="Fly Away" />
-    </div>
+    const searchBar = document.getElementById('searchBar');
+    searchBar.addEventListener('input', () => {
+        const query = searchBar.value.toLowerCase();
+        const filteredSongs = songData.filter(song => song.toLowerCase().includes(query)); // Filter song titles
+        displaySongs(filteredSongs);
+    });
 
-    <script>
-        function setupSongControls(audioPlayerId, playPauseButtonId, playPauseIconId) {
-            const audioPlayer = document.getElementById(audioPlayerId);
-            const playPauseButton = document.getElementById(playPauseButtonId);
-            const playPauseIcon = document.getElementById(playPauseIconId);
-            let isPlaying = true;
+    function displaySongs(songs) {
+        const songList = document.getElementById('songList');
+        songList.innerHTML = '';
 
-            audioPlayer.play();
+        songs.forEach(title => { // Loop through the titles directly
+            const songItem = document.createElement('div');
+            songItem.classList.add('songItem');
+            const file = `${title}.mp3`; // Assuming the mp3 files are named the same as the titles
+            const image = `${title}.jpg`; // Assuming the jpg images are named the same as the titles
 
-            playPauseButton.onclick = () => {
-                if (isPlaying) {
-                    audioPlayer.pause();
-                    isPlaying = false;
-                } else {
-                    audioPlayer.play();
-                    isPlaying = true;
-                }
-                playPauseIcon.src = isPlaying ? 'pause.png' : 'play.png';
+            songItem.dataset.song = file; // Set the dataset for the song file
+            songItem.dataset.image = image; // Set the dataset for the song image
+            songItem.innerText = title; // Set the text to the song title
+
+            songItem.onclick = () => {
+                openSongDetail(title, file, image); // Call the function to open song details
             };
+
+            songList.appendChild(songItem); // Append the song item to the list
+        });
+    }
+
+    function openSongDetail(title, file, image) {
+        document.getElementById('songName').innerText = title; // Display the song title
+        document.getElementById('songImage').src = image; // Display the song image
+
+        // Create or retrieve the audio player for the song
+        let audioPlayer;
+        if (!activePlayers[title]) {
+            audioPlayer = new Audio(file); // Create a new audio player
+            audioPlayer.style.display = 'none'; // Hide the player
+            activePlayers[title] = { player: audioPlayer, isPlaying: false }; // Store the player
+        } else {
+            audioPlayer = activePlayers[title].player; // Retrieve the existing player
         }
 
-        setupSongControls('audioPlayer1', 'playPauseButton1', 'playPauseIcon1');
-        setupSongControls('audioPlayer2', 'playPauseButton2', 'playPauseIcon2');
-        setupSongControls('audioPlayer3', 'playPauseButton3', 'playPauseIcon3');
-    </script>
+        // Show the song detail window
+        document.getElementById('songDetail').style.display = 'block';
+
+        // Handle play/pause button for this song
+        const playPauseButton = document.getElementById('playPauseButton');
+        const playPauseIcon = document.getElementById('playPauseIcon');
+
+        playPauseButton.onclick = () => {
+            if (activePlayers[title].isPlaying) {
+                audioPlayer.pause(); // Pause if currently playing
+                activePlayers[title].isPlaying = false;
+            } else {
+                audioPlayer.play(); // Play if currently paused
+                activePlayers[title].isPlaying = true;
+            }
+            updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying); // Update icon
+        };
+
+        // Close the detail view without stopping the song
+        document.getElementById('closeDetail').onclick = () => {
+            document.getElementById('songDetail').style.display = 'none'; // Hide the detail view
+        };
+    }
+
+    function updatePlayPauseIcon(icon, isPlaying) {
+        icon.src = isPlaying ? 'pause.png' : 'play.png'; // Update icon based on playing state
+    }
+</script>
+<script>
+    if (navigator.serviceWorker) {
+        navigator.serviceWorker.ready.then((registration) => {
+            registration.active.postMessage({ type: 'CACHE_SONGS' });
+        });
+    }
+</script>
+<script>
+    let currentlyPlayingSong = null;
+
+    function openSongDetail(title, file, image) {
+        document.getElementById('songName').innerText = title;
+        document.getElementById('songImage').src = image;
+
+        let audioPlayer;
+        if (!activePlayers[title]) {
+            audioPlayer = new Audio(file);
+            audioPlayer.style.display = 'none';
+            activePlayers[title] = { player: audioPlayer, isPlaying: false };
+        } else {
+            audioPlayer = activePlayers[title].player;
+        }
+
+        // Close the detail view without stopping the song
+        document.getElementById('closeDetail').onclick = () => {
+            document.getElementById('songDetail').style.display = 'none';
+        };
+
+        // Show the song detail window
+        document.getElementById('songDetail').style.display = 'block';
+
+        // Handle play/pause button for this song
+        const playPauseButton = document.getElementById('playPauseButton');
+        const playPauseIcon = document.getElementById('playPauseIcon');
+
+        playPauseButton.onclick = () => {
+            if (currentlyPlayingSong && currentlyPlayingSong !== title) {
+                // Pause the previously playing song
+                activePlayers[currentlyPlayingSong].player.pause();
+                activePlayers[currentlyPlayingSong].isPlaying = false;
+                updatePlayPauseIcon(playPauseIcon, false);
+            }
+
+            if (activePlayers[title].isPlaying) {
+                audioPlayer.pause();
+                activePlayers[title].isPlaying = false;
+                currentlyPlayingSong = null; // Reset since the song is paused
+            } else {
+                audioPlayer.play();
+                activePlayers[title].isPlaying = true;
+                currentlyPlayingSong = title; // Set the currently playing song
+            }
+            updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
+        };
+
+        // Update the play/pause icon for the current song
+        updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
+    }
+
+    function updatePlayPauseIcon(icon, isPlaying) {
+        icon.src = isPlaying ? 'pause.png' : 'play.png';
+    }
+</script>
+    <script>
+const cacheName = 'my-site-cache-v1';
+
+// Cache all elements when the page loads
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js').then(registration => {
+            console.log('Service Worker registered with scope:', registration.scope);
+        }).catch(error => {
+            console.error('Service Worker registration failed:', error);
+        });
+    });
+}
+
+self.addEventListener('install', event => {
+    event.waitUntil(
+        caches.open(cacheName).then(cache => {
+            return cache.addAll([
+                // Include the HTML file to ensure it's available offline
+                'index.html',
+                // Other resources can be dynamically cached
+            ]);
+        })
+    );
+});
+
+self.addEventListener('fetch', event => {
+    event.respondWith(
+        caches.match(event.request).then(response => {
+            return response || fetch(event.request).then(response => {
+                return caches.open(cacheName).then(cache => {
+                    cache.put(event.request, response.clone());
+                    return response;
+                });
+            });
+        })
+    );
+});
+</script>
 </body>
 </html>
