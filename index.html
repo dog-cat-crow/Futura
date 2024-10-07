@@ -264,13 +264,6 @@
     }
 </script>
 <script>
-    if (navigator.serviceWorker) {
-        navigator.serviceWorker.ready.then((registration) => {
-            registration.active.postMessage({ type: 'CACHE_SONGS' });
-        });
-    }
-</script>
-<script>
     let currentlyPlayingSong = null;
 
     function openSongDetail(title, file, image) {
@@ -344,9 +337,8 @@ self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(cacheName).then(cache => {
             return cache.addAll([
-                // Include the HTML file to ensure it's available offline
+                '/',
                 'index.html',
-                // Other resources can be dynamically cached
             ]);
         })
     );
@@ -354,11 +346,11 @@ self.addEventListener('install', event => {
 
 self.addEventListener('fetch', event => {
     event.respondWith(
-        caches.match(event.request).then(response => {
-            return response || fetch(event.request).then(response => {
+        caches.match(event.request).then(cachedResponse => {
+            return cachedResponse || fetch(event.request).then(networkResponse => {
                 return caches.open(cacheName).then(cache => {
-                    cache.put(event.request, response.clone());
-                    return response;
+                    cache.put(event.request, networkResponse.clone());
+                    return networkResponse;
                 });
             });
         })
