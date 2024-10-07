@@ -339,22 +339,39 @@ self.addEventListener('install', event => {
             return cache.addAll([
                 '/',
                 'index.html',
+                // Include MP3 files to be cached
             ]);
         })
     );
 });
 
 self.addEventListener('fetch', event => {
-    event.respondWith(
-        caches.match(event.request).then(cachedResponse => {
-            return cachedResponse || fetch(event.request).then(networkResponse => {
-                return caches.open(cacheName).then(cache => {
-                    cache.put(event.request, networkResponse.clone());
-                    return networkResponse;
+    if (event.request.url.endsWith('.mp3')) { // Cache MP3 files
+        event.respondWith(
+            caches.match(event.request).then(cachedResponse => {
+                if (cachedResponse) {
+                    return cachedResponse; // Serve from cache
+                }
+                return fetch(event.request).then(networkResponse => {
+                    return caches.open(cacheName).then(cache => {
+                        cache.put(event.request, networkResponse.clone()); // Cache the MP3
+                        return networkResponse;
+                    });
                 });
-            });
-        })
-    );
+            })
+        );
+    } else {
+        event.respondWith(
+            caches.match(event.request).then(cachedResponse => {
+                return cachedResponse || fetch(event.request).then(networkResponse => {
+                    return caches.open(cacheName).then(cache => {
+                        cache.put(event.request, networkResponse.clone());
+                        return networkResponse;
+                    });
+                });
+            })
+        );
+    }
 });
 </script>
 </body>
