@@ -62,8 +62,9 @@
             align-items: center;
         }
 
-        /* New songItem styling */
+        /* Updated songItem styling */
         .songItem {
+            background-color: #383735; /* Background color of the box */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -72,23 +73,28 @@
             font-family: 'Poppins';
             font-size: 20px;
             position: relative;
+            padding: 20px 0; /* Adds spacing inside the box */
+            border-radius: 10px;
         }
 
-        .songItem::before, .songItem::after {
+        .songItem::before {
             content: '';
             display: block;
             width: 100%;
             height: 1px;
             background-color: white;
             position: absolute;
+            top: 0; /* Line at the top of the song */
         }
 
-        .songItem::before {
-            top: -10px; /* Line above the song */
-        }
-
-        .songItem:not(:last-child)::after {
-            bottom: -10px; /* Line below the song, except for the last one */
+        .songItem:last-child::after {
+            content: '';
+            display: block;
+            width: 100%;
+            height: 1px;
+            background-color: white;
+            position: absolute;
+            bottom: 0; /* Line at the bottom for the last song */
         }
 
         #songDetail {
