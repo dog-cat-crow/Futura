@@ -198,7 +198,7 @@
     </div>
     <audio id="audioPlayer" controls style="display: none;"></audio>
 </div>
-<script>
+    <script>
     let songData = [];
     let activePlayers = {};
     let currentlyPlayingSong = null;
@@ -251,7 +251,7 @@
         if (!activePlayers[title]) {
             audioPlayer = new Audio(file);
             audioPlayer.style.display = 'none';
-            activePlayers[title] = { player: audioPlayer, isPlaying: false };
+            activePlayers[title] = { player: audioPlayer, isPlaying: false, lastTime: 0 };
         } else {
             audioPlayer = activePlayers[title].player;
         }
@@ -263,22 +263,28 @@
         const playPauseIcon = document.getElementById('playPauseIcon');
 
         playPauseButton.onclick = () => {
+            // Check if there's another song currently playing and pause it
             if (currentlyPlayingSong && currentlyPlayingSong !== title) {
                 activePlayers[currentlyPlayingSong].player.pause();
                 activePlayers[currentlyPlayingSong].isPlaying = false;
+                activePlayers[currentlyPlayingSong].lastTime = 0; // Reset time for the other song
                 updatePlayPauseIcon(playPauseIcon, false);
             }
 
-            audioPlayer.currentTime = 0;
+            // Start from the last known time if it's being resumed
+            audioPlayer.currentTime = activePlayers[title].lastTime;
+
             if (activePlayers[title].isPlaying) {
                 audioPlayer.pause();
                 activePlayers[title].isPlaying = false;
+                activePlayers[title].lastTime = audioPlayer.currentTime; // Save the current time
                 currentlyPlayingSong = null;
             } else {
                 audioPlayer.play();
                 activePlayers[title].isPlaying = true;
                 currentlyPlayingSong = title;
             }
+
             updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
         };
 
@@ -294,7 +300,6 @@
         document.getElementById('closeDetail').onclick = () => {
             document.getElementById('songDetail').style.display = 'none';
             document.body.style.overflow = '';
-            // Keep the song playing even when the detail view is closed
         };
     }
 
@@ -304,9 +309,11 @@
         const nextTitle = songData[nextIndex];
         const nextFile = `${nextTitle}.mp3`;
         const nextImage = `${nextTitle}.jpg`;
+
+        // Reset time to 0 for the next song
+        activePlayers[currentTitle].lastTime = 0;
+
         openSongDetail(nextTitle, nextFile, nextImage);
-        const nextAudioPlayer = activePlayers[nextTitle].player;
-        nextAudioPlayer.play();
     }
 
     function updatePlayPauseIcon(icon, isPlaying) {
