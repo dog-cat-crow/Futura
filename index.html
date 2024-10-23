@@ -247,14 +247,6 @@
         document.getElementById('songName').innerText = title;
         document.getElementById('songImage').src = image;
 
-        setInterval(() => {
-    if (currentlyPlayingSong) {
-        const playPauseIcon = document.getElementById('playPauseIcon');
-        const isPlaying = !activePlayers[currentlyPlayingSong].player.paused;
-        updatePlayPauseIcon(playPauseIcon, isPlaying);
-    }
-}, 50); // 0.05 seconds = 50 milliseconds
-
         let audioPlayer;
         if (!activePlayers[title]) {
             audioPlayer = new Audio(file);
@@ -305,9 +297,6 @@
             document.getElementById('songDetail').style.display = 'none';
             document.body.style.overflow = '';
         };
-
-        audioPlayer.play();
-updatePlayPauseIcon(playPauseIcon, true); // Ensure button updates to 'pause.png' when a new song starts playing
     }
 
     function playNextSong(currentTitle) {
@@ -327,17 +316,7 @@ updatePlayPauseIcon(playPauseIcon, true); // Ensure button updates to 'pause.png
     }
 
     function setUpSongListeners() {
-        const audioPlayer = document.getElementById('audioPlayer');
-
-        if (songData.length > 0) {
-            playSong(songData[0]);
-        }
-    }
-
-    function playSong(title) {
-        const audioPlayer = document.getElementById('audioPlayer');
-        audioPlayer.src = `${title}.mp3`;
-        audioPlayer.play();
+        // No autoplay logic here to ensure songs only play when the play button is tapped.
     }
 
     window.addEventListener('resize', applyResponsiveStyles);
