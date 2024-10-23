@@ -428,5 +428,105 @@ self.addEventListener('fetch', event => {
     }
 });
 </script>
+    <script>
+let songQueue = [];
+let currentSongIndex = 0;
+let activePlayers = {};
+let currentlyPlayingSong = null;
+
+fetch('songs.json')
+    .then(response => response.json())
+    .then(data => {
+        songQueue = data.songs;
+        initializeSongQueue();
+    })
+    .catch(error => {
+        console.error('Error fetching songs:', error);
+    });
+
+function initializeSongQueue() {
+    if (songQueue.length > 0) {
+        playSongInQueue(currentSongIndex);
+    }
+}
+
+function playSongInQueue(index) {
+    const title = songQueue[index];
+    const file = `${title}.mp3`;
+    const image = `${title}.jpg`;
+
+    openSongDetail(title, file, image);
+    let audioPlayer = activePlayers[title].player;
+
+    audioPlayer.onended = () => {
+        playNextInQueue();
+    };
+}
+
+function playNextInQueue() {
+    currentSongIndex++;
+    if (currentSongIndex >= songQueue.length) {
+        currentSongIndex = 0;
+    }
+    playSongInQueue(currentSongIndex);
+}
+
+function openSongDetail(title, file, image) {
+    document.getElementById('songName').innerText = title;
+    document.getElementById('songImage').src = image;
+
+    let audioPlayer;
+    if (!activePlayers[title]) {
+        audioPlayer = new Audio(file);
+        audioPlayer.style.display = 'none';
+        activePlayers[title] = { player: audioPlayer, isPlaying: false };
+    } else {
+        audioPlayer = activePlayers[title].player;
+    }
+
+    document.getElementById('songDetail').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+
+    const playPauseButton = document.getElementById('playPauseButton');
+    const playPauseIcon = document.getElementById('playPauseIcon');
+
+    playPauseButton.onclick = () => {
+        if (currentlyPlayingSong && currentlyPlayingSong !== title) {
+            activePlayers[currentlyPlayingSong].player.pause();
+            activePlayers[currentlyPlayingSong].isPlaying = false;
+            updatePlayPauseIcon(playPauseIcon, false);
+        }
+
+        if (activePlayers[title].isPlaying) {
+            audioPlayer.pause();
+            activePlayers[title].isPlaying = false;
+            currentlyPlayingSong = null;
+        } else {
+            audioPlayer.play();
+            activePlayers[title].isPlaying = true;
+            currentlyPlayingSong = title;
+        }
+        updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
+    };
+
+    audioPlayer.onended = () => {
+        activePlayers[title].isPlaying = false;
+        updatePlayPauseIcon(playPauseIcon, false);
+        currentlyPlayingSong = null;
+        playNextInQueue();
+    };
+
+    updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
+
+    document.getElementById('closeDetail').onclick = () => {
+        document.getElementById('songDetail').style.display = 'none';
+        document.body.style.overflow = '';
+    };
+}
+
+function updatePlayPauseIcon(icon, isPlaying) {
+    icon.src = isPlaying ? 'pause.png' : 'play.png';
+}
+</script>
 </body>
 </html>
