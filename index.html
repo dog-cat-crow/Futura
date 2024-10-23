@@ -354,6 +354,13 @@ function openSongDetail(title, file, image) {
         updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
     };
 
+    // Listen for the song to end and reset play/pause button
+    audioPlayer.onended = () => {
+        activePlayers[title].isPlaying = false;
+        updatePlayPauseIcon(playPauseIcon, false); // Reset to 'play' icon
+        currentlyPlayingSong = null;
+    };
+
     updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
 
     document.getElementById('closeDetail').onclick = () => {
