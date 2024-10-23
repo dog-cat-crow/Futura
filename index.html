@@ -198,7 +198,7 @@
     </div>
     <audio id="audioPlayer" controls style="display: none;"></audio>
 </div>
-    <script>
+<script>
     let songData = [];
     let activePlayers = {};
     let currentlyPlayingSong = null;
@@ -268,7 +268,6 @@
                 activePlayers[currentlyPlayingSong].player.pause();
                 activePlayers[currentlyPlayingSong].isPlaying = false;
                 activePlayers[currentlyPlayingSong].lastTime = 0; // Reset time for the other song
-                updatePlayPauseIcon(playPauseIcon, false);
             }
 
             // Start from the last known time if it's being resumed
@@ -277,7 +276,6 @@
             if (activePlayers[title].isPlaying) {
                 audioPlayer.pause();
                 activePlayers[title].isPlaying = false;
-                activePlayers[title].lastTime = audioPlayer.currentTime; // Save the current time
                 currentlyPlayingSong = null;
             } else {
                 audioPlayer.play();
@@ -291,8 +289,8 @@
         audioPlayer.onended = () => {
             activePlayers[title].isPlaying = false;
             currentlyPlayingSong = null;
-            updatePlayPauseIcon(playPauseIcon, false);
-            playNextSong(title);
+            updatePlayPauseIcon(playPauseIcon, false); // Reset icon to play
+            playNextSong(title); // Automatically play the next song
         };
 
         updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
@@ -301,6 +299,9 @@
             document.getElementById('songDetail').style.display = 'none';
             document.body.style.overflow = '';
         };
+
+        // Automatically play the song when opened
+        audioPlayer.play();
     }
 
     function playNextSong(currentTitle) {
@@ -313,11 +314,11 @@
         // Reset time to 0 for the next song
         activePlayers[currentTitle].lastTime = 0;
 
-        openSongDetail(nextTitle, nextFile, nextImage);
+        openSongDetail(nextTitle, nextFile, nextImage); // Open the next song details
     }
 
     function updatePlayPauseIcon(icon, isPlaying) {
-        icon.src = isPlaying ? 'pause.png' : 'play.png';
+        icon.src = isPlaying ? 'pause.png' : 'play.png'; // Update the icon based on playback state
     }
 
     function setUpSongListeners() {
