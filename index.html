@@ -430,9 +430,10 @@ self.addEventListener('fetch', event => {
 </script>
 <script>
     let songData = [];
-    let activePlayers = {};
     let currentSongIndex = 0;
+    let audioPlayer = new Audio();
 
+    // Fetch the songs from the songs.json file
     fetch('songs.json')
         .then(response => response.json())
         .then(data => {
@@ -450,6 +451,7 @@ self.addEventListener('fetch', event => {
         displaySongs(filteredSongs);
     });
 
+    // Function to display the songs in the list
     function displaySongs(songs) {
         const songList = document.getElementById('songList');
         songList.innerHTML = '';
@@ -465,72 +467,67 @@ self.addEventListener('fetch', event => {
             songItem.innerText = title;
 
             songItem.onclick = () => {
-                currentSongIndex = index; 
-                playSong(title, file, image);
+                currentSongIndex = index;  // Set the clicked song as the current song
+                playSong();
             };
 
             songList.appendChild(songItem);
         });
     }
 
-    function playSong(title, file, image) {
-        document.getElementById('songName').innerText = title;
+    // Function to play the song based on currentSongIndex
+    function playSong() {
+        const currentSong = songData[currentSongIndex];
+        const file = `${currentSong}.mp3`;
+        const image = `${currentSong}.jpg`;
+
+        // Update the song detail UI
+        document.getElementById('songName').innerText = currentSong;
         document.getElementById('songImage').src = image;
-
-        let audioPlayer;
-        if (!activePlayers[title]) {
-            audioPlayer = new Audio(file);
-            activePlayers[title] = { player: audioPlayer, isPlaying: false };
-        } else {
-            audioPlayer = activePlayers[title].player;
-        }
-
         document.getElementById('songDetail').style.display = 'block';
         document.body.style.overflow = 'hidden';
 
+        // Load and play the current song
+        audioPlayer.src = file;
+        audioPlayer.play();
+
         const playPauseButton = document.getElementById('playPauseButton');
         const playPauseIcon = document.getElementById('playPauseIcon');
-
-        playPauseButton.onclick = () => {
-            if (activePlayers[title].isPlaying) {
-                audioPlayer.pause();
-                activePlayers[title].isPlaying = false;
-            } else {
-                audioPlayer.play();
-                activePlayers[title].isPlaying = true;
-            }
-            updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
-        };
-
-        audioPlayer.onended = () => {
-            activePlayers[title].isPlaying = false;
-            updatePlayPauseIcon(playPauseIcon, false);
-            loadNextSong();
-        };
-
-        audioPlayer.play();
-        activePlayers[title].isPlaying = true;
         updatePlayPauseIcon(playPauseIcon, true);
+
+        // Event listener for when the song ends
+        audioPlayer.onended = loadNextSong;
+
+        // Play/pause functionality
+        playPauseButton.onclick = () => {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+                updatePlayPauseIcon(playPauseIcon, true);
+            } else {
+                audioPlayer.pause();
+                updatePlayPauseIcon(playPauseIcon, false);
+            }
+        };
+
+        // Close detail view
+        document.getElementById('closeDetail').onclick = () => {
+            document.getElementById('songDetail').style.display = 'none';
+            document.body.style.overflow = '';
+        };
     }
 
+    // Function to load and play the next song
     function loadNextSong() {
-        currentSongIndex = (currentSongIndex + 1) % songData.length;
-        const nextSongTitle = songData[currentSongIndex];
-        const nextSongFile = `${nextSongTitle}.mp3`;
-        const nextSongImage = `${nextSongTitle}.jpg`;
-
-        playSong(nextSongTitle, nextSongFile, nextSongImage);
+        currentSongIndex = (currentSongIndex + 1) % songData.length;  // Loop back to the first song if at the end
+        playSong();  // Play the next song
     }
 
+    // Function to update the play/pause icon
     function updatePlayPauseIcon(icon, isPlaying) {
         icon.src = isPlaying ? 'pause.png' : 'play.png';
     }
 
-    document.getElementById('closeDetail').onclick = () => {
-        document.getElementById('songDetail').style.display = 'none';
-        document.body.style.overflow = '';
-    };
-
+    // Make the page responsive
     window.addEventListener('resize', applyResponsiveStyles);
     applyResponsiveStyles();
 </script>
