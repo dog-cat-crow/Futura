@@ -1,4 +1,3 @@
-<script>
     let songData = [];
     let activePlayers = {};
     let currentlyPlayingSong = null;
@@ -165,4 +164,3 @@
             songItems[i].style.padding = songItemPadding + 'px 0';
         }
     }
-</script>
