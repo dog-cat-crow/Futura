@@ -269,7 +269,7 @@
                 updatePlayPauseIcon(playPauseIcon, false);
             }
 
-            audioPlayer.currentTime = 0; // Always start from the beginning
+            audioPlayer.currentTime = 0;
             if (activePlayers[title].isPlaying) {
                 audioPlayer.pause();
                 activePlayers[title].isPlaying = false;
@@ -294,11 +294,7 @@
         document.getElementById('closeDetail').onclick = () => {
             document.getElementById('songDetail').style.display = 'none';
             document.body.style.overflow = '';
-            if (currentlyPlayingSong) {
-                activePlayers[currentlyPlayingSong].player.pause();
-                activePlayers[currentlyPlayingSong].isPlaying = false;
-                updatePlayPauseIcon(playPauseIcon, false);
-            }
+            // Keep the song playing even when the detail view is closed
         };
     }
 
@@ -309,6 +305,8 @@
         const nextFile = `${nextTitle}.mp3`;
         const nextImage = `${nextTitle}.jpg`;
         openSongDetail(nextTitle, nextFile, nextImage);
+        const nextAudioPlayer = activePlayers[nextTitle].player;
+        nextAudioPlayer.play();
     }
 
     function updatePlayPauseIcon(icon, isPlaying) {
