@@ -316,58 +316,55 @@
 <script>
     let currentlyPlayingSong = null;
 
-    function openSongDetail(title, file, image) {
-        document.getElementById('songName').innerText = title;
-        document.getElementById('songImage').src = image;
+function openSongDetail(title, file, image) {
+    document.getElementById('songName').innerText = title;
+    document.getElementById('songImage').src = image;
 
-        let audioPlayer;
-        if (!activePlayers[title]) {
-            audioPlayer = new Audio(file);
-            audioPlayer.style.display = 'none';
-            activePlayers[title] = { player: audioPlayer, isPlaying: false };
-        } else {
-            audioPlayer = activePlayers[title].player;
+    let audioPlayer;
+    if (!activePlayers[title]) {
+        audioPlayer = new Audio(file);
+        audioPlayer.style.display = 'none';
+        activePlayers[title] = { player: audioPlayer, isPlaying: false };
+    } else {
+        audioPlayer = activePlayers[title].player;
+    }
+
+    document.getElementById('songDetail').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+
+    const playPauseButton = document.getElementById('playPauseButton');
+    const playPauseIcon = document.getElementById('playPauseIcon');
+
+    playPauseButton.onclick = () => {
+        if (currentlyPlayingSong && currentlyPlayingSong !== title) {
+            activePlayers[currentlyPlayingSong].player.pause();
+            activePlayers[currentlyPlayingSong].isPlaying = false;
+            updatePlayPauseIcon(playPauseIcon, false);
         }
 
-        // Close the detail view without stopping the song
-        document.getElementById('closeDetail').onclick = () => {
-            document.getElementById('songDetail').style.display = 'none';
-        };
-
-        // Show the song detail window
-        document.getElementById('songDetail').style.display = 'block';
-
-        // Handle play/pause button for this song
-        const playPauseButton = document.getElementById('playPauseButton');
-        const playPauseIcon = document.getElementById('playPauseIcon');
-
-        playPauseButton.onclick = () => {
-            if (currentlyPlayingSong && currentlyPlayingSong !== title) {
-                // Pause the previously playing song
-                activePlayers[currentlyPlayingSong].player.pause();
-                activePlayers[currentlyPlayingSong].isPlaying = false;
-                updatePlayPauseIcon(playPauseIcon, false);
-            }
-
-            if (activePlayers[title].isPlaying) {
-                audioPlayer.pause();
-                activePlayers[title].isPlaying = false;
-                currentlyPlayingSong = null; // Reset since the song is paused
-            } else {
-                audioPlayer.play();
-                activePlayers[title].isPlaying = true;
-                currentlyPlayingSong = title; // Set the currently playing song
-            }
-            updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
-        };
-
-        // Update the play/pause icon for the current song
+        if (activePlayers[title].isPlaying) {
+            audioPlayer.pause();
+            activePlayers[title].isPlaying = false;
+            currentlyPlayingSong = null;
+        } else {
+            audioPlayer.play();
+            activePlayers[title].isPlaying = true;
+            currentlyPlayingSong = title;
+        }
         updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
-    }
+    };
 
-    function updatePlayPauseIcon(icon, isPlaying) {
-        icon.src = isPlaying ? 'pause.png' : 'play.png';
-    }
+    updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
+
+    document.getElementById('closeDetail').onclick = () => {
+        document.getElementById('songDetail').style.display = 'none';
+        document.body.style.overflow = '';
+    };
+}
+
+function updatePlayPauseIcon(icon, isPlaying) {
+    icon.src = isPlaying ? 'pause.png' : 'play.png';
+}
 </script>
     <script>
 const cacheName = 'my-site-cache-v1';
