@@ -249,53 +249,56 @@
         let audioPlayer;
         if (!activePlayers[title]) {
             audioPlayer = new Audio(file);
-            audioPlayer.style.display = 'none';
             activePlayers[title] = { player: audioPlayer, isPlaying: false };
         } else {
             audioPlayer = activePlayers[title].player;
         }
 
         document.getElementById('songDetail').style.display = 'block';
-        document.body.classList.add('no-scroll');  // Disable background scrolling
+        document.body.style.overflow = 'hidden';
 
         const playPauseButton = document.getElementById('playPauseButton');
         const playPauseIcon = document.getElementById('playPauseIcon');
 
         playPauseButton.onclick = () => {
-            if (currentlyPlayingSong && currentlyPlayingSong !== title) {
-                activePlayers[currentlyPlayingSong].player.pause();
-                activePlayers[currentlyPlayingSong].isPlaying = false;
-                updatePlayPauseIcon(playPauseIcon, false);
-            }
+            if (currentlyPlayingSong !== title) {
+                // Pause the currently playing song if it's different
+                if (currentlyPlayingSong) {
+                    activePlayers[currentlyPlayingSong].player.pause();
+                    activePlayers[currentlyPlayingSong].isPlaying = false;
+                    updatePlayPauseIcon(playPauseIcon, false); // Reset to play icon
+                }
 
-            if (activePlayers[title].isPlaying) {
-                audioPlayer.pause();
-                activePlayers[title].isPlaying = false;
-                currentlyPlayingSong = null;
-            } else {
+                // Reset and play the current song
+                audioPlayer.currentTime = 0; // Start from the beginning
                 audioPlayer.play();
                 activePlayers[title].isPlaying = true;
-                currentlyPlayingSong = title;
+                currentlyPlayingSong = title; // Update currently playing song
+            } else {
+                // If the same song is clicked, toggle play/pause
+                if (activePlayers[title].isPlaying) {
+                    audioPlayer.pause();
+                    activePlayers[title].isPlaying = false;
+                } else {
+                    audioPlayer.play();
+                    activePlayers[title].isPlaying = true;
+                }
             }
             updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
         };
 
-        // Listen for the song to end and play the next one
+        // Listen for the song to end and reset play/pause button
         audioPlayer.onended = () => {
-            const currentIndex = songData.indexOf(title);
-            const nextIndex = (currentIndex + 1) % songData.length; // Loop back to the first song
-            const nextTitle = songData[nextIndex];
-            const nextFile = `${nextTitle}.mp3`;
-            const nextImage = `${nextTitle}.jpg`;
-
-            openSongDetail(nextTitle, nextFile, nextImage); // Open next song detail to play it
-            activePlayers[nextTitle].player.play(); // Automatically play the next song
+            activePlayers[title].isPlaying = false;
+            updatePlayPauseIcon(playPauseIcon, false); // Reset to 'play' icon
+            currentlyPlayingSong = null;
         };
 
-        document.getElementById('closeDetail').onclick = () => {
-            document.getElementById('songDetail').style.display = 'none';
-            document.body.classList.remove('no-scroll');  // Re-enable background scrolling
-        };
+        updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
+        // Ensure the current song is set correctly
+        if (activePlayers[title].isPlaying) {
+            audioPlayer.play(); // Play the current song if it was already playing
+        }
     }
 
     function updatePlayPauseIcon(icon, isPlaying) {
