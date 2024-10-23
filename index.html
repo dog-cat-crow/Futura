@@ -208,7 +208,6 @@
         .then(data => {
             songData = data.songs;
             displaySongs(songData);
-            setUpSongListeners();
         })
         .catch(error => {
             console.error('Error fetching songs:', error);
@@ -250,7 +249,8 @@
         let audioPlayer;
         if (!activePlayers[title]) {
             audioPlayer = new Audio(file);
-            activePlayers[title] = { player: audioPlayer, isPlaying: false, lastTime: 0 };
+            audioPlayer.style.display = 'none';
+            activePlayers[title] = { player: audioPlayer, isPlaying: false };
         } else {
             audioPlayer = activePlayers[title].player;
         }
@@ -261,68 +261,42 @@
         const playPauseButton = document.getElementById('playPauseButton');
         const playPauseIcon = document.getElementById('playPauseIcon');
 
+        // Interval for updating the button state
         const intervalId = setInterval(() => {
             updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
-        }, 1000);
+        }, 50); // Update every 50ms
 
         playPauseButton.onclick = () => {
             if (currentlyPlayingSong && currentlyPlayingSong !== title) {
                 activePlayers[currentlyPlayingSong].player.pause();
                 activePlayers[currentlyPlayingSong].isPlaying = false;
-                activePlayers[currentlyPlayingSong].lastTime = 0;
             }
 
             if (activePlayers[title].isPlaying) {
-                activePlayers[title].lastTime = audioPlayer.currentTime;
                 audioPlayer.pause();
                 activePlayers[title].isPlaying = false;
                 currentlyPlayingSong = null;
             } else {
-                audioPlayer.currentTime = activePlayers[title].lastTime;
                 audioPlayer.play();
                 activePlayers[title].isPlaying = true;
                 currentlyPlayingSong = title;
             }
-
-            updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
         };
 
         audioPlayer.onended = () => {
-            activePlayers[title].isPlaying = false;
+            activePlayers[title].isPlaying = false; // Update state when the song ends
             currentlyPlayingSong = null;
-            updatePlayPauseIcon(playPauseIcon, false);
-            playNextSong(title);
         };
-
-        updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
 
         document.getElementById('closeDetail').onclick = () => {
             document.getElementById('songDetail').style.display = 'none';
             document.body.style.overflow = '';
-            clearInterval(intervalId);
+            clearInterval(intervalId); // Clear the interval when closing detail
         };
-    }
-
-    function playNextSong(currentTitle) {
-        const currentIndex = songData.indexOf(currentTitle);
-        const nextIndex = (currentIndex + 1) % songData.length;
-        const nextTitle = songData[nextIndex];
-        const nextFile = `${nextTitle}.mp3`;
-        const nextImage = `${nextTitle}.jpg`;
-
-        activePlayers[currentTitle].lastTime = 0;
-
-        openSongDetail(nextTitle, nextFile, nextImage);
-        activePlayers[nextTitle].player.play();
-        activePlayers[nextTitle].isPlaying = true;
-        currentlyPlayingSong = nextTitle;
     }
 
     function updatePlayPauseIcon(icon, isPlaying) {
         icon.src = isPlaying ? 'pause.png' : 'play.png';
-    }
-
-    function setUpSongListeners() {
     }
 
     window.addEventListener('resize', applyResponsiveStyles);
