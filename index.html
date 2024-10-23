@@ -201,7 +201,7 @@
 <script>
     let songData = [];
     let activePlayers = {};
-    
+
     fetch('songs.json')
         .then(response => response.json())
         .then(data => {
@@ -255,6 +255,7 @@
         }
 
         document.getElementById('songDetail').style.display = 'block';
+        document.body.classList.add('no-scroll');  // Disable background scrolling
 
         const playPauseButton = document.getElementById('playPauseButton');
         const playPauseIcon = document.getElementById('playPauseIcon');
@@ -272,6 +273,7 @@
 
         document.getElementById('closeDetail').onclick = () => {
             document.getElementById('songDetail').style.display = 'none';
+            document.body.classList.remove('no-scroll');  // Re-enable background scrolling
         };
     }
 
@@ -310,7 +312,7 @@
 
     window.addEventListener('resize', applyResponsiveStyles);
     applyResponsiveStyles();
-               </script>
+</script>
 <script>
     let currentlyPlayingSong = null;
 
