@@ -250,7 +250,6 @@
         let audioPlayer;
         if (!activePlayers[title]) {
             audioPlayer = new Audio(file);
-            audioPlayer.style.display = 'none';
             activePlayers[title] = { player: audioPlayer, isPlaying: false, lastTime: 0 };
         } else {
             audioPlayer = activePlayers[title].player;
@@ -261,6 +260,7 @@
 
         const playPauseButton = document.getElementById('playPauseButton');
         const playPauseIcon = document.getElementById('playPauseIcon');
+
         const intervalId = setInterval(() => {
             updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
         }, 50);
@@ -279,6 +279,7 @@
                 currentlyPlayingSong = null;
             } else {
                 audioPlayer.currentTime = activePlayers[title].lastTime;
+                audioPlayer.play();
                 activePlayers[title].isPlaying = true;
                 currentlyPlayingSong = title;
             }
