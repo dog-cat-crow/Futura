@@ -429,88 +429,90 @@ self.addEventListener('fetch', event => {
 });
 </script>
 <script>
-    let songQueue = [
-        "Alone Part II",
-        "Animals",
-        "Fly Away",
-        "Dynamite",
-        "Dusk Till Dawn",
-        "Calm Down",
-        "Blinding Lights",
-        "Enemy (with JID)",
-        "Faded",
-        "Heat Waves",
-        "Ignite",
-        "Symphony",
-        "Stick Together",
-        "Levitating"
-    ];
+    const songFiles = {
+        "Alone Part II": "Alone Part II.mp3",
+        "Animals": "Animals.mp3",
+        "Fly Away": "Fly Away.mp3",
+        "Dynamite": "Dynamite.mp3",
+        "Dusk Till Dawn": "Dusk Till Dawn.mp3",
+        "Calm Down": "Calm Down.mp3",
+        "Blinding Lights": "Blinding Lights.mp3",
+        "Enemy (with JID)": "Enemy (with JID).mp3",
+        "Faded": "Faded.mp3",
+        "Heat Waves": "Heat Waves.mp3",
+        "Ignite": "Ignite.mp3",
+        "Symphony": "Symphony.mp3",
+        "Stick Together": "Stick Together.mp3",
+        "Levitating": "Levitating.mp3"
+    };
 
-    let currentSongIndex = 0;
-    let audioPlayer = null;
+    let currentAudio = null;
 
-    function loadAndPlaySong(index) {
-        if (index >= 0 && index < songQueue.length) {
-            const title = songQueue[index];
-            const file = `${title}.mp3`;
-            const image = `${title}.jpg`;
-            
-            console.log("Playing: " + title);
-
-            // Stop previous song if any
-            if (audioPlayer) {
-                audioPlayer.pause();
-                audioPlayer.src = '';
-            }
-
-            // Load the new song
-            audioPlayer = new Audio(file);
-
-            // Update song detail UI
-            document.getElementById('songName').innerText = title;
-            document.getElementById('songImage').src = image;
-            document.getElementById('songDetail').style.display = 'block';
-            document.body.classList.add('no-scroll');
-
-            // Play the song
-            audioPlayer.play();
-
-            // Event listener to detect when the song ends
-            audioPlayer.onended = () => {
-                currentSongIndex = (currentSongIndex + 1) % songQueue.length;  // Loop to next song
-                loadAndPlaySong(currentSongIndex);
-            };
-
-            updatePlayPauseButton(true);  // Update to "Pause" icon initially
-
-            // Toggle play/pause on button click
-            document.getElementById('playPauseButton').onclick = () => {
-                if (audioPlayer.paused) {
-                    audioPlayer.play();
-                    updatePlayPauseButton(true);
-                } else {
-                    audioPlayer.pause();
-                    updatePlayPauseButton(false);
-                }
-            };
-
-            // Close detail view
-            document.getElementById('closeDetail').onclick = () => {
-                document.getElementById('songDetail').style.display = 'none';
-                document.body.classList.remove('no-scroll');
-                audioPlayer.pause();  // Stop the current song when closing detail
-            };
+    function playSong(songName) {
+        // Stop the current song if it exists
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio.src = '';
         }
+
+        // Create a new Audio object for the next song
+        currentAudio = new Audio(songFiles[songName]);
+
+        // Play the song
+        currentAudio.play();
+
+        // Set up the end listener for each specific song
+        currentAudio.onended = () => {
+            switch (songName) {
+                case "Alone Part II":
+                    playSong("Animals");
+                    break;
+                case "Animals":
+                    playSong("Fly Away");
+                    break;
+                case "Fly Away":
+                    playSong("Dynamite");
+                    break;
+                case "Dynamite":
+                    playSong("Dusk Till Dawn");
+                    break;
+                case "Dusk Till Dawn":
+                    playSong("Calm Down");
+                    break;
+                case "Calm Down":
+                    playSong("Blinding Lights");
+                    break;
+                case "Blinding Lights":
+                    playSong("Enemy (with JID)");
+                    break;
+                case "Enemy (with JID)":
+                    playSong("Faded");
+                    break;
+                case "Faded":
+                    playSong("Heat Waves");
+                    break;
+                case "Heat Waves":
+                    playSong("Ignite");
+                    break;
+                case "Ignite":
+                    playSong("Symphony");
+                    break;
+                case "Symphony":
+                    playSong("Stick Together");
+                    break;
+                case "Stick Together":
+                    playSong("Levitating");
+                    break;
+                case "Levitating":
+                    // End of the playlist, do nothing or loop back
+                    currentAudio = null; // Reset current audio
+                    break;
+            }
+        };
     }
 
-    // Function to update play/pause button icon
-    function updatePlayPauseButton(isPlaying) {
-        const playPauseIcon = document.getElementById('playPauseIcon');
-        playPauseIcon.src = isPlaying ? 'pause.png' : 'play.png';
-    }
-
-    // Start playing the first song in the queue when page loads
-    loadAndPlaySong(currentSongIndex);
+    // Start playing the first song in the list
+    playSong("Alone Part II");
 </script>
 </body>
 </html>
