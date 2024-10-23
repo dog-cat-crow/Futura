@@ -287,11 +287,19 @@
             updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
         };
 
-        // Listen for the song to end and reset play/pause button
+        // Auto play the next song if the current one ends
         audioPlayer.onended = () => {
             activePlayers[title].isPlaying = false;
             updatePlayPauseIcon(playPauseIcon, false); // Reset to 'play' icon
             currentlyPlayingSong = null;
+
+            // Play next song automatically
+            const nextSongIndex = songData.indexOf(title) + 1;
+            if (nextSongIndex < songData.length) {
+                const nextSongTitle = songData[nextSongIndex];
+                openSongDetail(nextSongTitle, `${nextSongTitle}.mp3`, `${nextSongTitle}.jpg`);
+                activePlayers[nextSongTitle].player.play();
+            }
         };
 
         updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
