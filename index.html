@@ -429,34 +429,55 @@ self.addEventListener('fetch', event => {
 });
 </script>
 <script>
-    let audioPlayer = new Audio();
-    let songQueue = [];
-    let currentIndex = 0;
+    let songData = [];  // Holds song data from songs.json
+    let currentSongIndex = 0;  // Tracks the current song index
+    let audioPlayer = new Audio();  // Create an audio player instance
 
-    // Fetch the song list from songs.json
+    // Fetch songs from songs.json and create the queue
     fetch('songs.json')
         .then(response => response.json())
         .then(data => {
-            songQueue = data.songs; // Assume songs is an array of song titles without .mp3 extension
-            if (songQueue.length > 0) {
-                playSong(songQueue[currentIndex] + '.mp3'); // Start playing the first song
-            }
+            songData = data.songs;
+            createSongQueue(songData);
+            loadAndPlaySong(currentSongIndex);  // Start with the first song
         })
         .catch(error => {
-            console.error('Error loading song list:', error);
+            console.error('Error fetching songs:', error);
         });
 
-    // Play a song based on file name
-    function playSong(file) {
-        audioPlayer.src = file;
+    // Assigns numbers to each song in the song list
+    function createSongQueue(songs) {
+        songs.forEach((song, index) => {
+            console.log(`Song ${index + 1}: ${song}`);  // Label each song (1, 2, 3, ...)
+        });
+    }
+
+    // Load and play the song based on its index in the queue
+    function loadAndPlaySong(index) {
+        if (index >= songData.length) {
+            console.log('End of queue reached.');
+            return;  // Stop if there are no more songs in the queue
+        }
+
+        const currentSong = songData[index];
+        const songFile = `${currentSong}.mp3`;
+
+        // Load and play the song
+        audioPlayer.src = songFile;
         audioPlayer.play();
 
-        // Event listener to play the next song when the current one ends
+        // Event listener for when the song ends, to play the next one
         audioPlayer.onended = () => {
-            currentIndex = (currentIndex + 1) % songQueue.length; // Move to next song in a loop
-            playSong(songQueue[currentIndex] + '.mp3');
+            console.log(`${currentSong} finished. Playing the next song.`);
+            currentSongIndex++;  // Move to the next song in the queue
+            loadAndPlaySong(currentSongIndex);  // Play the next song
         };
     }
+
+    // Start playing the first song when the page loads
+    window.onload = () => {
+        console.log('Page loaded, starting playback.');
+    };
 </script>
 </body>
 </html>
