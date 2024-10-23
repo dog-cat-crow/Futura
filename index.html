@@ -261,7 +261,14 @@
         const playPauseButton = document.getElementById('playPauseButton');
         const playPauseIcon = document.getElementById('playPauseIcon');
 
-        // Remove the 50ms interval and update the icon based on play/pause events
+        // Check the current state of the player when the song detail window is opened
+        if (!audioPlayer.paused) {
+            playPauseIcon.src = 'pause.png';
+        } else {
+            playPauseIcon.src = 'play.png';
+        }
+
+        // Play/pause toggle logic
         playPauseButton.onclick = () => {
             if (currentlyPlayingSong && currentlyPlayingSong !== title) {
                 activePlayers[currentlyPlayingSong].player.pause();
@@ -279,7 +286,7 @@
                 currentlyPlayingSong = null;
             }
 
-            updatePlayPauseIcons();  // Update all play/pause icons after state change
+            updatePlayPauseIcons();  // Update play/pause icons after state change
         };
 
         // Update icon when the song starts playing
@@ -322,7 +329,6 @@
             const player = activePlayers[title].player;
             const playPauseIcon = document.getElementById('playPauseIcon');
 
-            // Ensure only the currently playing song shows the pause icon
             if (currentlyPlayingSong === title && !player.paused) {
                 playPauseIcon.src = 'pause.png';
             } else {
