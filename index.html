@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+    <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MusicDog</title>
@@ -60,12 +60,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 30px; /* Increased distance from search bar */
         }
 
         /* Updated songItem styling */
         .songItem {
-            background-color: #1c1c1c; /* Fully transparent */
+            background-color: #1c1c1c; /* Background color of the song box */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -74,8 +73,9 @@
             font-family: 'Poppins';
             font-size: 20px;
             position: relative;
-            padding: 20px 0; /* Adds spacing inside the box */
-            border-radius: 10px;
+            height: 14px; /* Set height to 14 pixels */
+            padding: 0; /* Remove padding to maintain the exact height */
+            /* Removed border-radius for pure rectangles */
         }
 
         .songItem::before {
