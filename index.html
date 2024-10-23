@@ -429,29 +429,34 @@ self.addEventListener('fetch', event => {
 });
 </script>
 <script>
-let audioPlayer = new Audio(); // Global audio player
+    let audioPlayer = new Audio();
+    let songQueue = [];
+    let currentIndex = 0;
 
-// Function to play a song
-function playSong(title, file, image) {
-    document.getElementById('songName').innerText = title;
-    document.getElementById('songImage').src = image;
-    
-    audioPlayer.src = file;  // Set the source of the audio player
-    audioPlayer.play();  // Start playing the song
+    // Fetch the song list from songs.json
+    fetch('songs.json')
+        .then(response => response.json())
+        .then(data => {
+            songQueue = data.songs; // Assume songs is an array of song titles without .mp3 extension
+            if (songQueue.length > 0) {
+                playSong(songQueue[currentIndex] + '.mp3'); // Start playing the first song
+            }
+        })
+        .catch(error => {
+            console.error('Error loading song list:', error);
+        });
 
-    // Handle the 'ended' event for when the song finishes
-    audioPlayer.onended = () => {
-        if (title === 'Animals') {
-            // If the current song is "Animals", play "Levitating" next
-            playSong('Levitating', 'Levitating.mp3', 'Levitating.jpg');
-        }
-    };
-}
+    // Play a song based on file name
+    function playSong(file) {
+        audioPlayer.src = file;
+        audioPlayer.play();
 
-// Example to initially play "Animals"
-function openSongDetail() {
-    playSong('Animals', 'Animals.mp3', 'Animals.jpg');
-}
+        // Event listener to play the next song when the current one ends
+        audioPlayer.onended = () => {
+            currentIndex = (currentIndex + 1) % songQueue.length; // Move to next song in a loop
+            playSong(songQueue[currentIndex] + '.mp3');
+        };
+    }
 </script>
 </body>
 </html>
