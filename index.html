@@ -263,7 +263,7 @@
 
         const intervalId = setInterval(() => {
             updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
-        }, 50);
+        }, 100);
 
         playPauseButton.onclick = () => {
             if (currentlyPlayingSong && currentlyPlayingSong !== title) {
