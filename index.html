@@ -261,10 +261,7 @@
         const playPauseButton = document.getElementById('playPauseButton');
         const playPauseIcon = document.getElementById('playPauseIcon');
 
-        const intervalId = setInterval(() => {
-            updatePlayPauseIcon(playPauseIcon, !audioPlayer.paused);
-        }, 50);
-
+        // Remove the 50ms interval and update the icon based on play/pause events
         playPauseButton.onclick = () => {
             if (currentlyPlayingSong && currentlyPlayingSong !== title) {
                 activePlayers[currentlyPlayingSong].player.pause();
@@ -283,6 +280,16 @@
             }
         };
 
+        // Update icon when the song starts playing
+        audioPlayer.addEventListener('play', () => {
+            updatePlayPauseIcon(playPauseIcon, true);
+        });
+
+        // Update icon when the song is paused
+        audioPlayer.addEventListener('pause', () => {
+            updatePlayPauseIcon(playPauseIcon, false);
+        });
+
         audioPlayer.onended = () => {
             currentlyPlayingSong = null;
             playNextSong(title);
@@ -291,7 +298,6 @@
         document.getElementById('closeDetail').onclick = () => {
             document.getElementById('songDetail').style.display = 'none';
             document.body.style.overflow = '';
-            clearInterval(intervalId);
         };
     }
 
