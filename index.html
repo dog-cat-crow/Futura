@@ -430,31 +430,33 @@ self.addEventListener('fetch', event => {
 </script>
 <script>
     let songQueue = [
-        { number: 1, title: "Alone Part II", file: "Alone Part II.mp3" },
-        { number: 2, title: "Animals", file: "Animals.mp3" },
-        { number: 3, title: "Fly Away", file: "Fly Away.mp3" },
-        { number: 4, title: "Dynamite", file: "Dynamite.mp3" },
-        { number: 5, title: "Dusk Till Dawn", file: "Dusk Till Dawn.mp3" },
-        { number: 6, title: "Calm Down", file: "Calm Down.mp3" },
-        { number: 7, title: "Blinding Lights", file: "Blinding Lights.mp3" },
-        { number: 8, title: "Enemy (with JID)", file: "Enemy (with JID).mp3" },
-        { number: 9, title: "Faded", file: "Faded.mp3" },
-        { number: 10, title: "Heat Waves", file: "Heat Waves.mp3" },
-        { number: 11, title: "Ignite", file: "Ignite.mp3" },
-        { number: 12, title: "Symphony", file: "Symphony.mp3" },
-        { number: 13, title: "Stick Together", file: "Stick Together.mp3" },
-        { number: 14, title: "Levitating", file: "Levitating.mp3" }
+        "Alone Part II",
+        "Animals",
+        "Fly Away",
+        "Dynamite",
+        "Dusk Till Dawn",
+        "Calm Down",
+        "Blinding Lights",
+        "Enemy (with JID)",
+        "Faded",
+        "Heat Waves",
+        "Ignite",
+        "Symphony",
+        "Stick Together",
+        "Levitating"
     ];
 
     let currentSongIndex = 0;
     let audioPlayer = null;
 
-    // Function to load and play a song based on the index in the queue
     function loadAndPlaySong(index) {
         if (index >= 0 && index < songQueue.length) {
-            const song = songQueue[index];
-            console.log("Playing: " + song.title);
+            const title = songQueue[index];
+            const file = `${title}.mp3`;
+            const image = `${title}.jpg`;
             
+            console.log("Playing: " + title);
+
             // Stop previous song if any
             if (audioPlayer) {
                 audioPlayer.pause();
@@ -462,22 +464,52 @@ self.addEventListener('fetch', event => {
             }
 
             // Load the new song
-            audioPlayer = new Audio(song.file);
+            audioPlayer = new Audio(file);
+
+            // Update song detail UI
+            document.getElementById('songName').innerText = title;
+            document.getElementById('songImage').src = image;
+            document.getElementById('songDetail').style.display = 'block';
+            document.body.classList.add('no-scroll');
 
             // Play the song
             audioPlayer.play();
 
             // Event listener to detect when the song ends
             audioPlayer.onended = () => {
-                currentSongIndex++;  // Increment to next song
-                if (currentSongIndex < songQueue.length) {
-                    loadAndPlaySong(currentSongIndex);  // Play the next song in the queue
+                currentSongIndex = (currentSongIndex + 1) % songQueue.length;  // Loop to next song
+                loadAndPlaySong(currentSongIndex);
+            };
+
+            updatePlayPauseButton(true);  // Update to "Pause" icon initially
+
+            // Toggle play/pause on button click
+            document.getElementById('playPauseButton').onclick = () => {
+                if (audioPlayer.paused) {
+                    audioPlayer.play();
+                    updatePlayPauseButton(true);
+                } else {
+                    audioPlayer.pause();
+                    updatePlayPauseButton(false);
                 }
+            };
+
+            // Close detail view
+            document.getElementById('closeDetail').onclick = () => {
+                document.getElementById('songDetail').style.display = 'none';
+                document.body.classList.remove('no-scroll');
+                audioPlayer.pause();  // Stop the current song when closing detail
             };
         }
     }
 
-    // Start playing the first song in the queue
+    // Function to update play/pause button icon
+    function updatePlayPauseButton(isPlaying) {
+        const playPauseIcon = document.getElementById('playPauseIcon');
+        playPauseIcon.src = isPlaying ? 'pause.png' : 'play.png';
+    }
+
+    // Start playing the first song in the queue when page loads
     loadAndPlaySong(currentSongIndex);
 </script>
 </body>
