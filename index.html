@@ -429,90 +429,49 @@ self.addEventListener('fetch', event => {
 });
 </script>
 <script>
-    const songFiles = {
-        "Alone Part II": "Alone Part II.mp3",
-        "Animals": "Animals.mp3",
-        "Fly Away": "Fly Away.mp3",
-        "Dynamite": "Dynamite.mp3",
-        "Dusk Till Dawn": "Dusk Till Dawn.mp3",
-        "Calm Down": "Calm Down.mp3",
-        "Blinding Lights": "Blinding Lights.mp3",
-        "Enemy (with JID)": "Enemy (with JID).mp3",
-        "Faded": "Faded.mp3",
-        "Heat Waves": "Heat Waves.mp3",
-        "Ignite": "Ignite.mp3",
-        "Symphony": "Symphony.mp3",
-        "Stick Together": "Stick Together.mp3",
-        "Levitating": "Levitating.mp3"
-    };
-
-    let currentAudio = null;
-
-    function playSong(songName) {
-        // Stop the current song if it exists
-        if (currentAudio) {
-            currentAudio.pause();
-            currentAudio.src = '';
-        }
-
-        // Create a new Audio object for the next song
-        currentAudio = new Audio(songFiles[songName]);
-
-        // Play the song
-        currentAudio.play();
-
-        // Set up the end listener for each specific song
-        currentAudio.onended = () => {
-            switch (songName) {
-                case "Alone Part II":
-                    playSong("Animals");
-                    break;
-                case "Animals":
-                    playSong("Fly Away");
-                    break;
-                case "Fly Away":
-                    playSong("Dynamite");
-                    break;
-                case "Dynamite":
-                    playSong("Dusk Till Dawn");
-                    break;
-                case "Dusk Till Dawn":
-                    playSong("Calm Down");
-                    break;
-                case "Calm Down":
-                    playSong("Blinding Lights");
-                    break;
-                case "Blinding Lights":
-                    playSong("Enemy (with JID)");
-                    break;
-                case "Enemy (with JID)":
-                    playSong("Faded");
-                    break;
-                case "Faded":
-                    playSong("Heat Waves");
-                    break;
-                case "Heat Waves":
-                    playSong("Ignite");
-                    break;
-                case "Ignite":
-                    playSong("Symphony");
-                    break;
-                case "Symphony":
-                    playSong("Stick Together");
-                    break;
-                case "Stick Together":
-                    playSong("Levitating");
-                    break;
-                case "Levitating":
-                    // End of the playlist, do nothing or loop back
-                    currentAudio = null; // Reset current audio
-                    break;
-            }
-        };
+    // Function to play a specific song
+    function playSong(file) {
+        const audioPlayer = document.getElementById('audioPlayer');
+        audioPlayer.src = file;
+        audioPlayer.play();
     }
 
-    // Start playing the first song in the list
-    playSong("Alone Part II");
+    // Set up listeners for each song's ending, triggering the next one
+    function setUpSongListeners() {
+        const audioPlayer = document.getElementById('audioPlayer');
+
+        // Start playing the first song (Alone Part II)
+        playSong("Alone Part II.mp3");
+
+        // Listener for when "Alone Part II" ends
+        audioPlayer.addEventListener('ended', function onAlonePartIIEnd() {
+            playSong("Animals.mp3"); // Play next song "Animals"
+            audioPlayer.removeEventListener('ended', onAlonePartIIEnd);
+
+            // Listener for when "Animals" ends
+            audioPlayer.addEventListener('ended', function onAnimalsEnd() {
+                playSong("Fly Away.mp3"); // Play next song "Fly Away"
+                audioPlayer.removeEventListener('ended', onAnimalsEnd);
+
+                // Listener for when "Fly Away" ends
+                audioPlayer.addEventListener('ended', function onFlyAwayEnd() {
+                    playSong("Dynamite.mp3"); // Play next song "Dynamite"
+                    audioPlayer.removeEventListener('ended', onFlyAwayEnd);
+
+                    // Continue this pattern for each additional song
+                    audioPlayer.addEventListener('ended', function onDynamiteEnd() {
+                        playSong("Dusk Till Dawn.mp3"); // Play next song "Dusk Till Dawn"
+                        audioPlayer.removeEventListener('ended', onDynamiteEnd);
+
+                        // You can add more listeners for other songs as needed...
+                    });
+                });
+            });
+        });
+    }
+
+    // Call the function to set up all the listeners
+    setUpSongListeners();
 </script>
 </body>
 </html>
