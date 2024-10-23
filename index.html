@@ -201,7 +201,7 @@
 <script>
     let songData = [];
     let activePlayers = {};
-    let currentlyPlayingSong = null;
+    let currentlyPlayingSong = null; // Track currently playing song
 
     fetch('songs.json')
         .then(response => response.json())
@@ -249,10 +249,14 @@
         let audioPlayer;
         if (!activePlayers[title]) {
             audioPlayer = new Audio(file);
+            audioPlayer.style.display = 'none';
             activePlayers[title] = { player: audioPlayer, isPlaying: false };
         } else {
             audioPlayer = activePlayers[title].player;
         }
+
+        // Reset playback to start
+        audioPlayer.currentTime = 0;
 
         document.getElementById('songDetail').style.display = 'block';
         document.body.style.overflow = 'hidden';
@@ -261,89 +265,92 @@
         const playPauseIcon = document.getElementById('playPauseIcon');
 
         playPauseButton.onclick = () => {
-            if (currentlyPlayingSong !== title) {
-                // Pause the currently playing song if it's different
-                if (currentlyPlayingSong) {
-                    activePlayers[currentlyPlayingSong].player.pause();
-                    activePlayers[currentlyPlayingSong].isPlaying = false;
-                    updatePlayPauseIcon(playPauseIcon, false); // Reset to play icon
-                }
+            if (currentlyPlayingSong && currentlyPlayingSong !== title) {
+                activePlayers[currentlyPlayingSong].player.pause();
+                activePlayers[currentlyPlayingSong].isPlaying = false;
+                updatePlayPauseIcon(playPauseIcon, false);
+            }
 
-                // Reset and play the current song
-                audioPlayer.currentTime = 0; // Start from the beginning
+            if (activePlayers[title].isPlaying) {
+                audioPlayer.pause();
+                activePlayers[title].isPlaying = false;
+                currentlyPlayingSong = null;
+            } else {
                 audioPlayer.play();
                 activePlayers[title].isPlaying = true;
-                currentlyPlayingSong = title; // Update currently playing song
-            } else {
-                // If the same song is clicked, toggle play/pause
-                if (activePlayers[title].isPlaying) {
-                    audioPlayer.pause();
-                    activePlayers[title].isPlaying = false;
-                } else {
-                    audioPlayer.play();
-                    activePlayers[title].isPlaying = true;
-                }
+                currentlyPlayingSong = title;
             }
             updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
         };
 
-        // Auto play the next song if the current one ends
+        // Listen for the song to end and reset play/pause button
         audioPlayer.onended = () => {
             activePlayers[title].isPlaying = false;
             updatePlayPauseIcon(playPauseIcon, false); // Reset to 'play' icon
             currentlyPlayingSong = null;
-
-            // Play next song automatically
-            const nextSongIndex = songData.indexOf(title) + 1;
-            if (nextSongIndex < songData.length) {
-                const nextSongTitle = songData[nextSongIndex];
-                openSongDetail(nextSongTitle, `${nextSongTitle}.mp3`, `${nextSongTitle}.jpg`);
-                activePlayers[nextSongTitle].player.play();
-            }
         };
 
         updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
-        // Ensure the current song is set correctly
-        if (activePlayers[title].isPlaying) {
-            audioPlayer.play(); // Play the current song if it was already playing
-        }
+
+        document.getElementById('closeDetail').onclick = () => {
+            document.getElementById('songDetail').style.display = 'none';
+            document.body.style.overflow = ''; // Re-enable background scrolling
+            if (currentlyPlayingSong) {
+                activePlayers[currentlyPlayingSong].player.pause(); // Pause the song when closing
+                activePlayers[currentlyPlayingSong].isPlaying = false;
+                updatePlayPauseIcon(playPauseIcon, false); // Reset play/pause icon
+                currentlyPlayingSong = null; // Reset currently playing song
+            }
+        };
     }
 
     function updatePlayPauseIcon(icon, isPlaying) {
         icon.src = isPlaying ? 'pause.png' : 'play.png';
     }
 
-    function applyResponsiveStyles() {
-        const screenWidth = window.innerWidth;
-
-        const songNameFontSize = (screenWidth * 6.67) / 100;
-        const songImageSize = (screenWidth * 50) / 100;
-        const buttonContainerPadding = (screenWidth * 16.67) / 100;
-        const playPauseButtonSize = (screenWidth * 19.44) / 100;
-        const closeButtonSize = (screenWidth * 6.94) / 100;
-        const headerPadding = (screenWidth * 5.56) / 100;
-        const searchBarWidth = (screenWidth * 83.33) / 100;
-        const songItemPadding = (screenWidth * 3.89) / 100;
-
-        document.getElementById('songName').style.fontSize = songNameFontSize + 'px';
-        document.getElementById('songImage').style.width = songImageSize + 'px';
-        document.getElementById('songImage').style.height = songImageSize + 'px';
-        document.getElementById('buttonContainer').style.paddingLeft = buttonContainerPadding + 'px';
-        document.getElementById('buttonContainer').style.paddingRight = buttonContainerPadding + 'px';
-        document.getElementById('playPauseIcon').style.maxWidth = playPauseButtonSize + 'px';
-        document.getElementById('playPauseIcon').style.maxHeight = playPauseButtonSize + 'px';
-        document.getElementById('closeDetail').style.fontSize = closeButtonSize + 'px';
-        document.getElementById('header').style.padding = headerPadding + 'px 0';
-        document.getElementById('searchBar').style.width = searchBarWidth + 'px';
-
-        const songItems = document.getElementsByClassName('songItem');
-        for (let i = 0; i < songItems.length; i++) {
-            songItems[i].style.padding = songItemPadding + 'px 0';
-        }
+    // Function to play a specific song
+    function playSong(file) {
+        const audioPlayer = document.getElementById('audioPlayer');
+        audioPlayer.src = file;
+        audioPlayer.play();
     }
 
-    window.addEventListener('resize', applyResponsiveStyles);
-    applyResponsiveStyles();
+    // Set up listeners for each song's ending, triggering the next one
+    function setUpSongListeners() {
+        const audioPlayer = document.getElementById('audioPlayer');
+
+        // Start playing the first song (Alone Part II)
+        playSong("Alone Part II.mp3");
+
+        // Listener for when "Alone Part II" ends
+        audioPlayer.addEventListener('ended', function onAlonePartIIEnd() {
+            playSong("Animals.mp3"); // Play next song "Animals"
+            audioPlayer.removeEventListener('ended', onAlonePartIIEnd);
+
+            // Listener for when "Animals" ends
+            audioPlayer.addEventListener('ended', function onAnimalsEnd() {
+                playSong("Fly Away.mp3"); // Play next song "Fly Away"
+                audioPlayer.removeEventListener('ended', onAnimalsEnd);
+
+                // Listener for when "Fly Away" ends
+                audioPlayer.addEventListener('ended', function onFlyAwayEnd() {
+                    playSong("Dynamite.mp3"); // Play next song "Dynamite"
+                    audioPlayer.removeEventListener('ended', onFlyAwayEnd);
+
+                    // Continue this pattern for each additional song
+                    audioPlayer.addEventListener('ended', function onDynamiteEnd() {
+                        playSong("Dusk Till Dawn.mp3"); // Play next song "Dusk Till Dawn"
+                        audioPlayer.removeEventListener('ended', onDynamiteEnd);
+
+                        // You can add more listeners for other songs as needed...
+                    });
+                });
+            });
+        });
+    }
+
+    // Call the function to set up all the listeners
+    setUpSongListeners();
 </script>
 <script>
     let currentlyPlayingSong = null;
