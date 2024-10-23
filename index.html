@@ -247,6 +247,14 @@
         document.getElementById('songName').innerText = title;
         document.getElementById('songImage').src = image;
 
+        setInterval(() => {
+    if (currentlyPlayingSong) {
+        const playPauseIcon = document.getElementById('playPauseIcon');
+        const isPlaying = !activePlayers[currentlyPlayingSong].player.paused;
+        updatePlayPauseIcon(playPauseIcon, isPlaying);
+    }
+}, 50); // 0.05 seconds = 50 milliseconds
+
         let audioPlayer;
         if (!activePlayers[title]) {
             audioPlayer = new Audio(file);
