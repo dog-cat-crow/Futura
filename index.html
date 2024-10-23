@@ -26,6 +26,12 @@
             user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
+        #container {
+            width: 420px; /* Fixed width */
+            transform: scale(0.0525); /* Scale factor for 420px */
+            transform-origin: top left; 
+            overflow: hidden; /* Prevent scrollbars */
+        }
         #header {
             text-align: center;
             margin: 20px 0;
@@ -61,22 +67,19 @@
             flex-direction: column;
             align-items: center;
         }
-
-        /* Updated songItem styling */
         .songItem {
-            background-color: #1c1c1c; /* Set to desired color */
+            background-color: #1c1c1c;
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 85%; /* 70% of the user's device width */
-            margin: 0; /* No distance between songs */
+            width: 85%;
+            margin: 0;
             font-family: 'Poppins';
             font-size: 20px;
             position: relative;
-            padding: 14px 0; /* Adds 10 pixels of vertical padding */
-            border-radius: 0; /* Make sure it's a pure rectangle */
+            padding: 14px 0;
+            border-radius: 0;
         }
-
         .songItem::before {
             content: '';
             display: block;
@@ -84,9 +87,8 @@
             height: 1px;
             background-color: white;
             position: absolute;
-            top: 0; /* Line at the top of the song */
+            top: 0;
         }
-
         .songItem:last-child::after {
             content: '';
             display: block;
@@ -94,9 +96,8 @@
             height: 1px;
             background-color: white;
             position: absolute;
-            bottom: 0; /* Line at the bottom for the last song */
+            bottom: 0;
         }
-
         #songDetail {
             padding: 0;
             position: fixed;
