@@ -201,6 +201,7 @@
 <script>
     let songData = [];
     let activePlayers = {};
+    let currentlyPlayingSong = null;
 
     fetch('songs.json')
         .then(response => response.json())
@@ -261,14 +262,34 @@
         const playPauseIcon = document.getElementById('playPauseIcon');
 
         playPauseButton.onclick = () => {
+            if (currentlyPlayingSong && currentlyPlayingSong !== title) {
+                activePlayers[currentlyPlayingSong].player.pause();
+                activePlayers[currentlyPlayingSong].isPlaying = false;
+                updatePlayPauseIcon(playPauseIcon, false);
+            }
+
             if (activePlayers[title].isPlaying) {
                 audioPlayer.pause();
                 activePlayers[title].isPlaying = false;
+                currentlyPlayingSong = null;
             } else {
                 audioPlayer.play();
                 activePlayers[title].isPlaying = true;
+                currentlyPlayingSong = title;
             }
             updatePlayPauseIcon(playPauseIcon, activePlayers[title].isPlaying);
+        };
+
+        // Listen for the song to end and play the next one
+        audioPlayer.onended = () => {
+            const currentIndex = songData.indexOf(title);
+            const nextIndex = (currentIndex + 1) % songData.length; // Loop back to the first song
+            const nextTitle = songData[nextIndex];
+            const nextFile = `${nextTitle}.mp3`;
+            const nextImage = `${nextTitle}.jpg`;
+
+            openSongDetail(nextTitle, nextFile, nextImage); // Open next song detail to play it
+            activePlayers[nextTitle].player.play(); // Automatically play the next song
         };
 
         document.getElementById('closeDetail').onclick = () => {
