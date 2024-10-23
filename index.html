@@ -428,50 +428,5 @@ self.addEventListener('fetch', event => {
     }
 });
 </script>
-<script>
-    // Function to play a specific song
-    function playSong(file) {
-        const audioPlayer = document.getElementById('audioPlayer');
-        audioPlayer.src = file;
-        audioPlayer.play();
-    }
-
-    // Set up listeners for each song's ending, triggering the next one
-    function setUpSongListeners() {
-        const audioPlayer = document.getElementById('audioPlayer');
-
-        // Start playing the first song (Alone Part II)
-        playSong("Alone Part II.mp3");
-
-        // Listener for when "Alone Part II" ends
-        audioPlayer.addEventListener('ended', function onAlonePartIIEnd() {
-            playSong("Animals.mp3"); // Play next song "Animals"
-            audioPlayer.removeEventListener('ended', onAlonePartIIEnd);
-
-            // Listener for when "Animals" ends
-            audioPlayer.addEventListener('ended', function onAnimalsEnd() {
-                playSong("Fly Away.mp3"); // Play next song "Fly Away"
-                audioPlayer.removeEventListener('ended', onAnimalsEnd);
-
-                // Listener for when "Fly Away" ends
-                audioPlayer.addEventListener('ended', function onFlyAwayEnd() {
-                    playSong("Dynamite.mp3"); // Play next song "Dynamite"
-                    audioPlayer.removeEventListener('ended', onFlyAwayEnd);
-
-                    // Continue this pattern for each additional song
-                    audioPlayer.addEventListener('ended', function onDynamiteEnd() {
-                        playSong("Dusk Till Dawn.mp3"); // Play next song "Dusk Till Dawn"
-                        audioPlayer.removeEventListener('ended', onDynamiteEnd);
-
-                        // You can add more listeners for other songs as needed...
-                    });
-                });
-            });
-        });
-    }
-
-    // Call the function to set up all the listeners
-    setUpSongListeners();
-</script>
 </body>
 </html>
