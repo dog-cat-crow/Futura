@@ -278,16 +278,18 @@
                 audioPlayer.pause();
                 currentlyPlayingSong = null;
             }
+
+            updatePlayPauseIcons();  // Update all play/pause icons after state change
         };
 
         // Update icon when the song starts playing
         audioPlayer.addEventListener('play', () => {
-            updatePlayPauseIcon(playPauseIcon, true);
+            updatePlayPauseIcons();
         });
 
         // Update icon when the song is paused
         audioPlayer.addEventListener('pause', () => {
-            updatePlayPauseIcon(playPauseIcon, false);
+            updatePlayPauseIcons();
         });
 
         audioPlayer.onended = () => {
@@ -315,8 +317,17 @@
         currentlyPlayingSong = nextTitle;
     }
 
-    function updatePlayPauseIcon(icon, isPlaying) {
-        icon.src = isPlaying ? 'pause.png' : 'play.png';
+    function updatePlayPauseIcons() {
+        Object.keys(activePlayers).forEach(title => {
+            const player = activePlayers[title].player;
+            const playPauseIcon = document.getElementById('playPauseIcon');
+
+            if (currentlyPlayingSong === title && !player.paused) {
+                playPauseIcon.src = 'pause.png';
+            } else {
+                playPauseIcon.src = 'play.png';
+            }
+        });
     }
 
     function setUpSongListeners() {
