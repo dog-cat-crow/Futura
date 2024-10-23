@@ -429,55 +429,56 @@ self.addEventListener('fetch', event => {
 });
 </script>
 <script>
-    let songData = [];  // Holds song data from songs.json
-    let currentSongIndex = 0;  // Tracks the current song index
-    let audioPlayer = new Audio();  // Create an audio player instance
+    let songQueue = [
+        { number: 1, title: "Alone Part II", file: "Alone Part II.mp3" },
+        { number: 2, title: "Animals", file: "Animals.mp3" },
+        { number: 3, title: "Fly Away", file: "Fly Away.mp3" },
+        { number: 4, title: "Dynamite", file: "Dynamite.mp3" },
+        { number: 5, title: "Dusk Till Dawn", file: "Dusk Till Dawn.mp3" },
+        { number: 6, title: "Calm Down", file: "Calm Down.mp3" },
+        { number: 7, title: "Blinding Lights", file: "Blinding Lights.mp3" },
+        { number: 8, title: "Enemy (with JID)", file: "Enemy (with JID).mp3" },
+        { number: 9, title: "Faded", file: "Faded.mp3" },
+        { number: 10, title: "Heat Waves", file: "Heat Waves.mp3" },
+        { number: 11, title: "Ignite", file: "Ignite.mp3" },
+        { number: 12, title: "Symphony", file: "Symphony.mp3" },
+        { number: 13, title: "Stick Together", file: "Stick Together.mp3" },
+        { number: 14, title: "Levitating", file: "Levitating.mp3" }
+    ];
 
-    // Fetch songs from songs.json and create the queue
-    fetch('songs.json')
-        .then(response => response.json())
-        .then(data => {
-            songData = data.songs;
-            createSongQueue(songData);
-            loadAndPlaySong(currentSongIndex);  // Start with the first song
-        })
-        .catch(error => {
-            console.error('Error fetching songs:', error);
-        });
+    let currentSongIndex = 0;
+    let audioPlayer = null;
 
-    // Assigns numbers to each song in the song list
-    function createSongQueue(songs) {
-        songs.forEach((song, index) => {
-            console.log(`Song ${index + 1}: ${song}`);  // Label each song (1, 2, 3, ...)
-        });
-    }
-
-    // Load and play the song based on its index in the queue
+    // Function to load and play a song based on the index in the queue
     function loadAndPlaySong(index) {
-        if (index >= songData.length) {
-            console.log('End of queue reached.');
-            return;  // Stop if there are no more songs in the queue
+        if (index >= 0 && index < songQueue.length) {
+            const song = songQueue[index];
+            console.log("Playing: " + song.title);
+            
+            // Stop previous song if any
+            if (audioPlayer) {
+                audioPlayer.pause();
+                audioPlayer.src = '';
+            }
+
+            // Load the new song
+            audioPlayer = new Audio(song.file);
+
+            // Play the song
+            audioPlayer.play();
+
+            // Event listener to detect when the song ends
+            audioPlayer.onended = () => {
+                currentSongIndex++;  // Increment to next song
+                if (currentSongIndex < songQueue.length) {
+                    loadAndPlaySong(currentSongIndex);  // Play the next song in the queue
+                }
+            };
         }
-
-        const currentSong = songData[index];
-        const songFile = `${currentSong}.mp3`;
-
-        // Load and play the song
-        audioPlayer.src = songFile;
-        audioPlayer.play();
-
-        // Event listener for when the song ends, to play the next one
-        audioPlayer.onended = () => {
-            console.log(`${currentSong} finished. Playing the next song.`);
-            currentSongIndex++;  // Move to the next song in the queue
-            loadAndPlaySong(currentSongIndex);  // Play the next song
-        };
     }
 
-    // Start playing the first song when the page loads
-    window.onload = () => {
-        console.log('Page loaded, starting playback.');
-    };
+    // Start playing the first song in the queue
+    loadAndPlaySong(currentSongIndex);
 </script>
 </body>
 </html>
